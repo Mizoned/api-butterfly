@@ -14,11 +14,11 @@ export class ProductsService {
         return id;
     }
 
-    async create(customerDto: any) {
-        return customerDto;
+    async create(productDto: any) {
+        return productDto;
     }
 
-    async update(id: number, customerDto: any) {
+    async update(id: number, productDto: any) {
         return id;
     }
 

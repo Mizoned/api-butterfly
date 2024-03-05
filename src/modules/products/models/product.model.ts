@@ -3,7 +3,7 @@ import { DataTypes } from "sequelize";
 
 interface ProductCreationAttrs {
     name: string;
-    price: string;
+    price: number;
 }
 
 @Table({ tableName: 'products' })
@@ -14,6 +14,6 @@ export class ProductModel extends Model<ProductModel, ProductCreationAttrs> {
     @Column({ type: DataTypes.STRING, allowNull: false })
     name: string;
 
-    @Column({ type: DataTypes.NUMBER, allowNull: false })
+    @Column({ type: DataTypes.FLOAT, allowNull: false })
     price: number;
 }
