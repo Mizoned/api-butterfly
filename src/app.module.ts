@@ -4,6 +4,7 @@ import { SequelizeModule } from "@nestjs/sequelize";
 
 import mainConfig from './core/config/main.config';
 import { CustomersModule } from "./modules/customers/customers.module";
+import {ProductsModule} from "./modules/products/products.module";
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { CustomersModule } from "./modules/customers/customers.module";
           autoLoadModels: true,
           synchronize: true
       }),
-      CustomersModule
+      CustomersModule,
+      ProductsModule
   ],
   controllers: [],
   providers: [],
