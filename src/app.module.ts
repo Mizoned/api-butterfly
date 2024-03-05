@@ -4,7 +4,8 @@ import { SequelizeModule } from "@nestjs/sequelize";
 
 import mainConfig from './core/config/main.config';
 import { CustomersModule } from "./modules/customers/customers.module";
-import {ProductsModule} from "./modules/products/products.module";
+import { ProductsModule } from "./modules/products/products.module";
+import { UsersModule } from "./modules/users/users.module";
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import {ProductsModule} from "./modules/products/products.module";
           synchronize: true
       }),
       CustomersModule,
-      ProductsModule
+      ProductsModule,
+      UsersModule
   ],
   controllers: [],
   providers: [],
