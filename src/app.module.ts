@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from "@nestjs/sequelize";
 
 import mainConfig from './core/config/main.config';
+import { CustomersModule } from "./modules/customers/customers.module";
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import mainConfig from './core/config/main.config';
           dialect: 'postgres',
           autoLoadModels: true,
           synchronize: true
-      })
+      }),
+      CustomersModule
   ],
   controllers: [],
   providers: [],
