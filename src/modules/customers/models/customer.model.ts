@@ -1,5 +1,6 @@
-import { Table, Column, Model } from 'sequelize-typescript';
+import { Table, Column, Model, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { DataTypes } from "sequelize";
+import { UserModel } from "../../users/models/user.model";
 
 interface CustomerCreationAttrs {
     firstName: string;
@@ -28,4 +29,11 @@ export class CustomerModel extends Model<CustomerModel, CustomerCreationAttrs> {
 
     @Column({ type: DataTypes.STRING, unique: true, allowNull: true })
     email: string;
+
+    @ForeignKey(() => UserModel)
+    @Column({ type: DataTypes.INTEGER })
+    userId: number;
+
+    @BelongsTo(() => UserModel, 'userId')
+    user: UserModel;
 }

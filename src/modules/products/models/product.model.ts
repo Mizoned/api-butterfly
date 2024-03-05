@@ -1,5 +1,6 @@
-import { Table, Column, Model } from 'sequelize-typescript';
+import { Table, Column, Model, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { DataTypes } from "sequelize";
+import { UserModel } from "../../users/models/user.model";
 
 interface ProductCreationAttrs {
     name: string;
@@ -16,4 +17,11 @@ export class ProductModel extends Model<ProductModel, ProductCreationAttrs> {
 
     @Column({ type: DataTypes.FLOAT, allowNull: false })
     price: number;
+
+    @ForeignKey(() => UserModel)
+    @Column({ type: DataTypes.INTEGER })
+    userId: number;
+
+    @BelongsTo(() => UserModel, 'userId')
+    user: UserModel;
 }
