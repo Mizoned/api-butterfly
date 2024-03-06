@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 
-import mainConfig from './core/config/main.config';
-import { CustomersModule } from './modules/customers/customers.module';
-import { ProductsModule } from './modules/products/products.module';
-import { UsersModule } from './modules/users/users.module';
+import mainConfig from '@common/config/main.config';
+import { CustomersModule } from '@modules/customers/customers.module';
+import { ProductsModule } from '@modules/products/products.module';
+import { UsersModule } from '@modules/users/users.module';
 
 @Module({
   imports: [

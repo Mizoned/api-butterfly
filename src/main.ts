@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from "@nestjs/common";
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 
@@ -26,6 +27,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/api/docs', app, document);
 
+  app.useGlobalPipes(new ValidationPipe());
   const port = configService.get<number>('API_PORT');
 
   await app.listen(port, () => {

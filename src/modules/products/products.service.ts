@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductModel } from './models/product.model';
+import { CreateProductDto } from '@modules/products/dto/create-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -14,11 +15,11 @@ export class ProductsService {
         return id;
     }
 
-    async create(productDto: any) {
+    async create(productDto: CreateProductDto) {
         return productDto;
     }
 
-    async update(id: number, productDto: any) {
+    async update(id: number, productDto: CreateProductDto) {
         return id;
     }
 
