@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import {ConfigModule, ConfigService} from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 
 import mainConfig from '@common/config/main.config';
@@ -14,15 +14,18 @@ import { UsersModule } from '@modules/users/users.module';
           envFilePath: ['.env'],
           isGlobal: true
       }),
-      SequelizeModule.forRoot({
-          username: process.env.DATABASE_USERNAME,
-          password: process.env.DATABASE_PASSWORD,
-          database: process.env.DATABASE_NAME,
-          host: process.env.DATABASE_HOST,
-          port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
-          dialect: 'postgres',
-          autoLoadModels: true,
-          synchronize: true
+      SequelizeModule.forRootAsync({
+          useFactory: (configService: ConfigService) => ({
+              username: configService.get('DATABASE_USERNAME'),
+              password: configService.get('DATABASE_PASSWORD'),
+              database: configService.get('DATABASE_NAME'),
+              host: configService.get('DATABASE_HOST'),
+              port: parseInt(configService.get('DATABASE_PORT'), 10) || 5432,
+              dialect: configService.get('DATABASE_DIALECT') || 'postgres',
+              autoLoadModels: true,
+              synchronize: true
+          }),
+          inject: [ConfigService]
       }),
       CustomersModule,
       ProductsModule,
