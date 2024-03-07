@@ -17,16 +17,16 @@ export class UserModel extends Model<UserModel, UserCreationAttrs> {
     @Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
     id: number;
 
-    @Column({ type: DataTypes.STRING, allowNull: false })
+    @Column({ type: DataTypes.STRING, allowNull: true })
     firstName: string;
 
-    @Column({ type: DataTypes.STRING, allowNull: false })
+    @Column({ type: DataTypes.STRING, allowNull: true })
     lastName: string;
 
-    @Column({ type: DataTypes.STRING, allowNull: false })
+    @Column({ type: DataTypes.STRING, allowNull: true })
     fatherName: string;
 
-    @Column({ type: DataTypes.STRING, allowNull: false })
+    @Column({ type: DataTypes.STRING, allowNull: true })
     mobilePhone: string;
 
     @Column({ type: DataTypes.STRING, unique: true, allowNull: true })

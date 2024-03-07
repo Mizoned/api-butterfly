@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 
 @ApiTags('Пользователи')
 @Controller('users')
@@ -21,8 +22,8 @@ export class UsersController {
 
     @ApiOperation({ summary: 'Создание пользователя' })
     @Post('/')
-    public async create(@Body() productDto: any) {
-        return await this.usersService.create(productDto);
+    public async create(@Body() createUserDto: CreateUserDto) {
+        return await this.usersService.create(createUserDto);
     }
 
     @ApiOperation({ summary: 'Обновление пользователя' })
