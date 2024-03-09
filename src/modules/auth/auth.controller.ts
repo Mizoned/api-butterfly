@@ -6,9 +6,11 @@ import LoginUserDto from '@modules/auth/dto/login-user.dto';
 import RegisterUserDto from '@modules/auth/dto/register-user.dto';
 import { Cookie } from '@common/decorators/cookies.decorator';
 import { Response } from 'express';
+import { Public } from '@common/decorators/public.decorator';
 
 const REFRESH_TOKEN = 'refreshToken';
 
+@Public()
 @ApiTags('Авторизация')
 @Controller('auth')
 export class AuthController {

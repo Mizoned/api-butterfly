@@ -6,6 +6,8 @@ import { ProductsModule } from '@modules/products/products.module';
 import { UsersModule } from '@modules/users/users.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { TokensModule } from '@modules/tokens/tokens.module';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 import mainConfig from '@common/config/main.config';
 
 @Module({
@@ -35,6 +37,11 @@ import mainConfig from '@common/config/main.config';
       TokensModule
   ],
   controllers: [],
-  providers: [],
+  providers: [
+      {
+          provide: APP_GUARD,
+          useClass: JwtAuthGuard
+      }
+  ],
 })
 export class AppModule {}
