@@ -44,30 +44,21 @@ export class TokensService {
 
     async processGenerateTokens(user: UserModel): Promise<ITokens> {
         const tokenData = await this.findRefreshTokenByUserId(user.id);
-
         const payload = JwtPayloadDto.getObjectByUserModel(user);
         const { accessToken, refreshToken } = await this.generateTokens(payload);
 
-        let isError = false;
-
-        if (tokenData) {
-            const result = tokenData.update({ token: refreshToken.token });
-
-            if (!result) {
-                isError = true;
-            }
-        } else {
-            const result = await this.tokensRepository.create({
-                userId: user.id,
-                token: refreshToken.token
+        try {
+            await this.tokensRepository.sequelize.transaction(async (transaction) => {
+                if (tokenData) {
+                    await tokenData.update({ token: refreshToken.token }, { transaction });
+                } else {
+                    await this.tokensRepository.create({
+                        userId: user.id,
+                        token: refreshToken.token
+                    }, { transaction });
+                }
             });
-
-            if (!result) {
-                isError = true;
-            }
-        }
-
-        if (isError) {
+        } catch (e) {
             throw new InternalServerErrorException('Произошла непредвиденная ошибка');
         }
 
