@@ -1,27 +1,47 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
+import { ApiError, ApiException } from '@common/exceptions/api.exception';
+
+interface ApiErrorResponse {
+    message: string,
+    errors?: ApiError[],
+    statusCode: number,
+    timestamp?: string,
+    path?: any
+}
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
     constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
     catch(exception: unknown, host: ArgumentsHost): void {
-        // In certain situations `httpAdapter` might not be available in the
-        // constructor method, thus we should resolve it here.
         const { httpAdapter } = this.httpAdapterHost;
 
         const ctx = host.switchToHttp();
 
-        const httpStatus =
-            exception instanceof HttpException
-                ? exception.getStatus()
-                : HttpStatus.INTERNAL_SERVER_ERROR;
+        let responseBody: ApiErrorResponse, httpStatus: number;
 
-        const responseBody = {
-            statusCode: httpStatus,
-            timestamp: new Date().toISOString(),
-            path: httpAdapter.getRequestUrl(ctx.getRequest()),
-        };
+        if (exception instanceof ApiException) {
+            httpStatus = exception.getStatus();
+
+            responseBody = {
+                message: exception.message,
+                errors: exception.errors,
+                statusCode: httpStatus,
+            }
+        } else {
+            httpStatus =
+                exception instanceof HttpException
+                    ? exception.getStatus()
+                    : HttpStatus.INTERNAL_SERVER_ERROR;
+
+            responseBody = {
+                message: 'Произошла непредвиденная ошибка',
+                statusCode: httpStatus,
+                timestamp: new Date().toISOString(),
+                path: httpAdapter.getRequestUrl(ctx.getRequest()),
+            };
+        }
 
         httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
     }
