@@ -7,9 +7,10 @@ import { UsersModule } from '@modules/users/users.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { TokensModule } from '@modules/tokens/tokens.module';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
-import {APP_GUARD, APP_PIPE} from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import mainConfig from '@common/config/main.config';
-import {ApiValidationPipe} from "@common/pipes/api-validation.pipe";
+import { ApiValidationPipe } from '@common/pipes/api-validation.pipe';
+import { AllExceptionsFilter } from '@common/filters/api-exception.filter';
 
 @Module({
   imports: [
@@ -46,6 +47,10 @@ import {ApiValidationPipe} from "@common/pipes/api-validation.pipe";
       {
           provide: APP_PIPE,
           useClass: ApiValidationPipe
+      },
+      {
+          provide: APP_FILTER,
+          useClass: AllExceptionsFilter
       }
   ],
 })
