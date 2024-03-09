@@ -18,6 +18,6 @@ export class CreateCustomerDto {
 
     @IsString({ message: VALIDATION_ERROR.IS_STRING })
     @IsNotEmpty({ message: VALIDATION_ERROR.IS_NOT_EMPTY })
-    @IsMobilePhone("ru-RU", {}, { message: VALIDATION_ERROR.IS_NOT_EMPTY })
+    @IsMobilePhone("ru-RU", {}, { message: VALIDATION_ERROR.IS_MOBILE_PHONE })
     mobilePhone: string;
 }
