@@ -1,4 +1,4 @@
-import {Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ScheduleService } from '@modules/schedule/schedule.service';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
@@ -18,7 +18,7 @@ export class ScheduleController {
     }
 
     @ApiOperation({ summary: 'Получение расписания по id' })
-    @Get('/')
+    @Get(':id')
     async findOne(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
         return await this.scheduleService.findOne(id, user.id);
     }

@@ -4,6 +4,7 @@ import { ProductModel } from '@modules/products/models/product.model';
 import { CustomerModel } from '@modules/customers/models/customer.model';
 import { ScheduleModel } from '@modules/schedule/models/schedule.model';
 import { TokenModel } from '@modules/tokens/models/token.model';
+import { ExpensesModel } from '@modules/expenses/models/expenses.model';
 
 interface UserCreationAttrs {
     firstName: string;
@@ -48,4 +49,7 @@ export class UserModel extends Model<UserModel, UserCreationAttrs> {
 
     @HasMany(() => ScheduleModel, 'userId')
     schedule: ScheduleModel[];
+
+    @HasMany(() => ExpensesModel, 'userId')
+    expenses: ExpensesModel[];
 }

@@ -31,16 +31,18 @@ export class ScheduleService {
         return schedule;
     }
 
-    async create(userId: number, scheduleDto: CreateScheduleDto) {
-        const schedule = await this.scheduleRepository.create({
-            ...scheduleDto,
-            userId
-        });
-
-        return schedule;
+    async create(userId: number, scheduleDto: CreateScheduleDto): Promise<ScheduleModel> {
+        try {
+            return this.scheduleRepository.create({
+                ...scheduleDto,
+                userId
+            });
+        } catch (e) {
+            throw new ApiException('Не удалось создать расписание', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    async update(id: number, userId: number, scheduleDto: UpdateScheduleDto) {
+    async update(id: number, userId: number, scheduleDto: UpdateScheduleDto): Promise<ScheduleModel> {
         const schedule = await this.scheduleRepository.findByPk(id);
 
         if (!schedule) {
@@ -59,7 +61,7 @@ export class ScheduleService {
         }
     }
 
-    async delete(id: number, userId: number) {
+    async delete(id: number, userId: number): Promise<{ deletedCount: number }> {
         const schedule = await this.scheduleRepository.findByPk(id);
 
         if (!schedule) {

@@ -69,7 +69,7 @@ export class CustomersService {
         }
     }
 
-    async delete(id: number, userId: number) {
+    async delete(id: number, userId: number): Promise<{ deletedCount: number }> {
         const customer = await this.customersRepository.findByPk(id);
 
         if (!customer) {

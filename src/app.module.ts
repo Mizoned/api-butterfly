@@ -7,11 +7,12 @@ import { UsersModule } from '@modules/users/users.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { TokensModule } from '@modules/tokens/tokens.module';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
-import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
-import mainConfig from '@common/config/main.config';
+import { ScheduleModule } from '@modules/schedule/schedule.module';
+import { ExpensesModule } from '@modules/expenses/expenses.module';
 import { ApiValidationPipe } from '@common/pipes/api-validation.pipe';
 import { AllExceptionsFilter } from '@common/filters/api-exception.filter';
-import { ScheduleModule } from './modules/schedule/schedule.module';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import mainConfig from '@common/config/main.config';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { ScheduleModule } from './modules/schedule/schedule.module';
       UsersModule,
       AuthModule,
       TokensModule,
-      ScheduleModule
+      ScheduleModule,
+      ExpensesModule
   ],
   controllers: [],
   providers: [
