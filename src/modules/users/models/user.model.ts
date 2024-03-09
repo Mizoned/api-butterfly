@@ -1,7 +1,9 @@
-import { Table, Column, Model, HasMany } from 'sequelize-typescript';
-import { DataTypes } from "sequelize";
-import { ProductModel } from "../../products/models/product.model";
-import {CustomerModel} from "../../customers/models/customer.model";
+import { Table, Column, Model, HasMany, HasOne } from 'sequelize-typescript';
+import { DataTypes } from 'sequelize';
+import { ProductModel } from '@modules/products/models/product.model';
+import { CustomerModel } from '@modules/customers/models/customer.model';
+import { ScheduleModel } from '@modules/schedule/models/schedule.model';
+import { TokenModel } from '@modules/tokens/models/token.model';
 
 interface UserCreationAttrs {
     firstName: string;
@@ -35,9 +37,15 @@ export class UserModel extends Model<UserModel, UserCreationAttrs> {
     @Column({ type: DataTypes.STRING, allowNull: false })
     password: string;
 
+    @HasOne(() => TokenModel, 'userId')
+    token: TokenModel
+
     @HasMany(() => CustomerModel, 'userId')
     customer: CustomerModel[];
 
     @HasMany(() => ProductModel, 'userId')
     product: ProductModel[];
+
+    @HasMany(() => ScheduleModel, 'userId')
+    schedule: ScheduleModel[];
 }

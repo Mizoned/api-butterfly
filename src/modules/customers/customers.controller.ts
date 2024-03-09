@@ -4,6 +4,7 @@ import { CustomersService } from './customers.service';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { IJwtPayload } from '@modules/tokens/interfaces/jwt-payload.interface';
 import { CreateCustomerDto } from '@modules/customers/dto/create-customer.dto';
+import { UpdateCustomerDto } from '@modules/customers/dto/update-customer.dto';
 
 @ApiTags('Клиенты пользователя')
 @Controller('customers')
@@ -30,7 +31,7 @@ export class CustomersController {
 
     @ApiOperation({ summary: 'Обновление клиента' })
     @Put(':id')
-    public async update(@Param('id') id: number, @CurrentUser() user: IJwtPayload, @Body() customerDto: any) {
+    public async update(@Param('id') id: number, @CurrentUser() user: IJwtPayload, @Body() customerDto: UpdateCustomerDto) {
         return await this.customersService.update(id, user.id, customerDto);
     }
 

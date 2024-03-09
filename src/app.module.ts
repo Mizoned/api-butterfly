@@ -11,6 +11,7 @@ import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import mainConfig from '@common/config/main.config';
 import { ApiValidationPipe } from '@common/pipes/api-validation.pipe';
 import { AllExceptionsFilter } from '@common/filters/api-exception.filter';
+import { ScheduleModule } from './modules/schedule/schedule.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { AllExceptionsFilter } from '@common/filters/api-exception.filter';
       ProductsModule,
       UsersModule,
       AuthModule,
-      TokensModule
+      TokensModule,
+      ScheduleModule
   ],
   controllers: [],
   providers: [

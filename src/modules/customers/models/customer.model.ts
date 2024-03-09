@@ -1,6 +1,7 @@
-import { Table, Column, Model, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { DataTypes } from "sequelize";
-import { UserModel } from "../../users/models/user.model";
+import { Table, Column, Model, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
+import { DataTypes } from 'sequelize';
+import { UserModel } from '@modules/users/models/user.model';
+import { ScheduleModel } from '@modules/schedule/models/schedule.model';
 
 interface CustomerCreationAttrs {
     firstName: string;
@@ -37,4 +38,7 @@ export class CustomerModel extends Model<CustomerModel, CustomerCreationAttrs> {
 
     @BelongsTo(() => UserModel, 'userId')
     user: UserModel;
+
+    @HasMany(() => ScheduleModel, 'customerId')
+    schedule: ScheduleModel[];
 }
