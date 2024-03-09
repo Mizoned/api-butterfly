@@ -8,8 +8,11 @@ import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
+    //TODO В будущем закрыть доступ/удалить контроллер для CRUD пользователя
+    //TODO Переделать CRUD ЛК для пользователя, возможно вынести в другую сущьность с настроками пользователя
+
     @ApiOperation({ summary: 'Получение всех пользователей' })
-    @Get()
+    @Get('/')
     async findAll() {
         return await this.usersService.findAll();
     }

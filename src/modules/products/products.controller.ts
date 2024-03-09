@@ -11,7 +11,7 @@ export class ProductsController {
     constructor(private readonly productsService: ProductsService) {}
 
     @ApiOperation({ summary: 'Получение всех услуг' })
-    @Get()
+    @Get('/')
     async findAll(@CurrentUser() user: IJwtPayload) {
         return await this.productsService.findAll(user.id);
     }
