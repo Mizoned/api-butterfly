@@ -8,6 +8,7 @@ interface CustomerCreationAttrs {
     fatherName: string;
     mobilePhone: string;
     email: string;
+    userId: number;
 }
 
 @Table({ tableName: 'customers' })
@@ -18,20 +19,20 @@ export class CustomerModel extends Model<CustomerModel, CustomerCreationAttrs> {
     @Column({ type: DataTypes.STRING, allowNull: false })
     firstName: string;
 
-    @Column({ type: DataTypes.STRING, allowNull: false })
+    @Column({ type: DataTypes.STRING })
     lastName: string;
 
-    @Column({ type: DataTypes.STRING, allowNull: false })
+    @Column({ type: DataTypes.STRING })
     fatherName: string;
 
-    @Column({ type: DataTypes.STRING, allowNull: false })
+    @Column({ type: DataTypes.STRING, allowNull: false, unique: true })
     mobilePhone: string;
 
-    @Column({ type: DataTypes.STRING, unique: true, allowNull: true })
+    @Column({ type: DataTypes.STRING })
     email: string;
 
     @ForeignKey(() => UserModel)
-    @Column({ type: DataTypes.INTEGER })
+    @Column({ type: DataTypes.INTEGER, allowNull: false })
     userId: number;
 
     @BelongsTo(() => UserModel, 'userId')
