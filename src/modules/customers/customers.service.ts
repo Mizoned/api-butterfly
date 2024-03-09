@@ -24,6 +24,10 @@ export class CustomersService {
             throw new ApiException('Клиент не найден', HttpStatus.NOT_FOUND);
         }
 
+        if (customer.userId !== userId) {
+            throw new ApiException('У вас нет прав на просмотр клиента', HttpStatus.FORBIDDEN);
+        }
+
         return customer;
     }
 
@@ -40,7 +44,7 @@ export class CustomersService {
         }
 
         try {
-            return this.customersRepository.create({ ...customerDto, userId });
+            return await this.customersRepository.create({ ...customerDto, userId });
         } catch (e) {
             throw new ApiException('Не удалось создать клиента', HttpStatus.INTERNAL_SERVER_ERROR);
         }

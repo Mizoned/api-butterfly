@@ -5,6 +5,7 @@ import { UserModel } from "../../users/models/user.model";
 interface ProductCreationAttrs {
     name: string;
     price: number;
+    userId: number;
 }
 
 @Table({ tableName: 'products' })
