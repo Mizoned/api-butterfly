@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { ExpensesService } from '@modules/expenses/expenses.service';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
@@ -25,13 +25,13 @@ export class ExpensesController {
 
     @ApiOperation({ summary: 'Создание расхода' })
     @Post('/')
-    async create(@CurrentUser() user: IJwtPayload, expensesDto: CreateExpensesDto) {
+    async create(@CurrentUser() user: IJwtPayload, @Body() expensesDto: CreateExpensesDto) {
         return this.expensesService.create(user.id, expensesDto);
     }
 
     @ApiOperation({ summary: 'Обновление расхода' })
     @Put(':id')
-    async update(@Param('id') id: number, @CurrentUser() user: IJwtPayload, expensesDto: UpdateExpensesDto) {
+    async update(@Param('id') id: number, @CurrentUser() user: IJwtPayload, @Body() expensesDto: UpdateExpensesDto) {
         return this.expensesService.update(id, user.id, expensesDto);
     }
 

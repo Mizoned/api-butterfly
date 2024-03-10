@@ -21,7 +21,7 @@ export class ProductsService {
         });
 
         if (!product) {
-            throw new ApiException('Клиент не найден', HttpStatus.NOT_FOUND);
+            throw new ApiException('Услуга не найдена', HttpStatus.NOT_FOUND);
         }
 
         if (product.userId !== userId) {
@@ -43,11 +43,11 @@ export class ProductsService {
         const product = await this.productsRepository.findByPk(id);
 
         if (!product) {
-            throw new ApiException('Продукт не найден', HttpStatus.NOT_FOUND);
+            throw new ApiException('Услуга не найдена', HttpStatus.NOT_FOUND);
         }
 
         if (product.userId !== userId) {
-            throw new ApiException('У вас нет прав на обновление продукта', HttpStatus.FORBIDDEN);
+            throw new ApiException('У вас нет прав на обновление услуги', HttpStatus.FORBIDDEN);
         }
 
         try {
@@ -62,11 +62,11 @@ export class ProductsService {
         const product = await this.productsRepository.findByPk(id);
 
         if (!product) {
-            throw new ApiException('Продукт не найден', HttpStatus.NOT_FOUND);
+            throw new ApiException('Услуга не найден', HttpStatus.NOT_FOUND);
         }
 
         if (product.userId !== userId) {
-            throw new ApiException('У вас нет прав на удаление продукта', HttpStatus.FORBIDDEN);
+            throw new ApiException('У вас нет прав на удаление услуги', HttpStatus.FORBIDDEN);
         }
 
         const deletedCount = await this.productsRepository.destroy({ where: { id } });

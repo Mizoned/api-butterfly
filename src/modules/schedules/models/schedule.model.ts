@@ -13,7 +13,7 @@ interface ScheduleCreationAttrs {
     timeEnd: Date;
 }
 
-@Table({ tableName: 'schedule' })
+@Table({ tableName: 'schedules' })
 export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
     @Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
     id: number;
