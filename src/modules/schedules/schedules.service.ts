@@ -1,12 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ScheduleModel } from '@modules/schedule/models/schedule.model';
+import { ScheduleModel } from '@modules/schedules/models/schedule.model';
 import { ApiException } from '@common/exceptions/api.exception';
-import { CreateScheduleDto } from '@modules/schedule/dto/create-schedule.dto';
-import { UpdateScheduleDto } from '@modules/schedule/dto/update-schedule.dto';
+import { CreateScheduleDto } from '@modules/schedules/dto/create-schedule.dto';
+import { UpdateScheduleDto } from '@modules/schedules/dto/update-schedule.dto';
 import { InjectModel } from '@nestjs/sequelize';
 
 @Injectable()
-export class ScheduleService {
+export class SchedulesService {
     constructor(@InjectModel(ScheduleModel) private readonly scheduleRepository: typeof ScheduleModel) {}
 
     async findAll(userId: number): Promise<ScheduleModel[]> {

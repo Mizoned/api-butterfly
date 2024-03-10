@@ -1,15 +1,15 @@
 import { Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ScheduleService } from '@modules/schedule/schedule.service';
+import { SchedulesService } from '@modules/schedules/schedules.service';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { IJwtPayload } from '@modules/tokens/interfaces/jwt-payload.interface';
-import { CreateScheduleDto } from '@modules/schedule/dto/create-schedule.dto';
-import { UpdateScheduleDto } from '@modules/schedule/dto/update-schedule.dto';
+import { CreateScheduleDto } from '@modules/schedules/dto/create-schedule.dto';
+import { UpdateScheduleDto } from '@modules/schedules/dto/update-schedule.dto';
 
 @ApiTags('Расписание пользователя')
 @Controller('schedule')
-export class ScheduleController {
-    constructor(private readonly scheduleService: ScheduleService) {}
+export class SchedulesController {
+    constructor(private readonly scheduleService: SchedulesService) {}
 
     @ApiOperation({ summary: 'Получение всех расписаний' })
     @Get('/')

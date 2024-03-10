@@ -1,6 +1,6 @@
 import { Table, Column, Model, ForeignKey } from 'sequelize-typescript';
 import { DataTypes } from 'sequelize';
-import { ScheduleModel } from '@modules/schedule/models/schedule.model';
+import { ScheduleModel } from '@modules/schedules/models/schedule.model';
 import { ProductModel } from '@modules/products/models/product.model';
 
 interface ScheduleProductsCreationAttrs {

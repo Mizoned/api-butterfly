@@ -2,7 +2,7 @@ import { Table, Column, Model, HasMany, HasOne } from 'sequelize-typescript';
 import { DataTypes } from 'sequelize';
 import { ProductModel } from '@modules/products/models/product.model';
 import { CustomerModel } from '@modules/customers/models/customer.model';
-import { ScheduleModel } from '@modules/schedule/models/schedule.model';
+import { ScheduleModel } from '@modules/schedules/models/schedule.model';
 import { TokenModel } from '@modules/tokens/models/token.model';
 import { ExpensesModel } from '@modules/expenses/models/expenses.model';
 

@@ -1,7 +1,7 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { DataTypes } from 'sequelize';
 import { UserModel } from '@modules/users/models/user.model';
-import { ScheduleModel } from '@modules/schedule/models/schedule.model';
+import { ScheduleModel } from '@modules/schedules/models/schedule.model';
 
 interface CustomerCreationAttrs {
     firstName: string;

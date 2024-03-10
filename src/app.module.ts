@@ -7,7 +7,7 @@ import { UsersModule } from '@modules/users/users.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { TokensModule } from '@modules/tokens/tokens.module';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
-import { ScheduleModule } from '@modules/schedule/schedule.module';
+import { SchedulesModule } from '@modules/schedules/schedules.module';
 import { ExpensesModule } from '@modules/expenses/expenses.module';
 import { ApiValidationPipe } from '@common/pipes/api-validation.pipe';
 import { AllExceptionsFilter } from '@common/filters/api-exception.filter';
@@ -39,7 +39,7 @@ import mainConfig from '@common/config/main.config';
       UsersModule,
       AuthModule,
       TokensModule,
-      ScheduleModule,
+      SchedulesModule,
       ExpensesModule
   ],
   controllers: [],

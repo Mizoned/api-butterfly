@@ -1,8 +1,8 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, BelongsToMany } from 'sequelize-typescript';
 import { DataTypes } from "sequelize";
 import { UserModel } from "@modules/users/models/user.model";
-import { ScheduleProductsModel } from '@modules/schedule/models/schedule-products.model';
-import { ScheduleModel } from '@modules/schedule/models/schedule.model';
+import { ScheduleProductsModel } from '@modules/schedules/models/schedule-products.model';
+import { ScheduleModel } from '@modules/schedules/models/schedule.model';
 
 interface ProductCreationAttrs {
     name: string;
