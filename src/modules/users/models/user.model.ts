@@ -42,13 +42,13 @@ export class UserModel extends Model<UserModel, UserCreationAttrs> {
     token: TokenModel
 
     @HasMany(() => CustomerModel, 'userId')
-    customer: CustomerModel[];
+    customers: CustomerModel[];
 
     @HasMany(() => ProductModel, 'userId')
-    product: ProductModel[];
+    products: ProductModel[];
 
     @HasMany(() => ScheduleModel, 'userId')
-    schedule: ScheduleModel[];
+    schedules: ScheduleModel[];
 
     @HasMany(() => ExpensesModel, 'userId')
     expenses: ExpensesModel[];

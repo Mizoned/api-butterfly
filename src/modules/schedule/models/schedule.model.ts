@@ -1,7 +1,9 @@
-import { Table, Column, Model, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, ForeignKey, BelongsTo, BelongsToMany } from 'sequelize-typescript';
 import { DataTypes } from 'sequelize';
 import { UserModel } from '@modules/users/models/user.model';
 import { CustomerModel } from '@modules/customers/models/customer.model';
+import { ProductModel } from '@modules/products/models/product.model';
+import { ScheduleProductsModel } from '@modules/schedule/models/schedule-products.model';
 
 interface ScheduleCreationAttrs {
     userId: number;
@@ -38,4 +40,7 @@ export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
 
     @BelongsTo(() => CustomerModel, 'customerId')
     customer: CustomerModel;
+
+    @BelongsToMany(() => ProductModel, () => ScheduleProductsModel)
+    products: ProductModel[];
 }
