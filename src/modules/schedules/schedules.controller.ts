@@ -40,4 +40,10 @@ export class SchedulesController {
     async delete(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
         return await this.scheduleService.delete(id, user.id);
     }
+
+    @ApiOperation({ summary: 'Получение свободных слотов по выбранной дате' })
+    @Get('slots/free')
+    async findFreeTimeSlots(@Body() obj: { date: string }, @CurrentUser() user: IJwtPayload) {
+        return await this.scheduleService.findFreeTimeSlots(user.id, obj.date);
+    }
 }

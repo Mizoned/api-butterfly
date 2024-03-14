@@ -8,9 +8,9 @@ import { ScheduleProductsModel } from '@modules/schedules/models/schedule-produc
 interface ScheduleCreationAttrs {
     userId: number;
     customerId: number;
-    date: Date;
-    timeStart: Date;
-    timeEnd: Date;
+    date: string;
+    timeStart: string;
+    timeEnd: string;
 }
 
 @Table({ tableName: 'schedules' })
@@ -18,14 +18,14 @@ export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
     @Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
     id: number;
 
-    @Column({ type: DataTypes.DATE, allowNull: false })
-    date: Date;
+    @Column({ type: DataTypes.DATEONLY, allowNull: false })
+    date: string;
 
-    @Column({ type: DataTypes.DATE, allowNull: false })
-    timeStart: Date;
+    @Column({ type: DataTypes.STRING, allowNull: false })
+    timeStart: string;
 
-    @Column({ type: DataTypes.DATE, allowNull: false })
-    timeEnd: Date;
+    @Column({ type: DataTypes.STRING, allowNull: false })
+    timeEnd: string;
 
     @ForeignKey(() => UserModel)
     @Column({ type: DataTypes.INTEGER, allowNull: false })

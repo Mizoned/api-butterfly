@@ -8,16 +8,12 @@ interface ScheduleProductsCreationAttrs {
     productId: number;
     priceAtSale: number;
     quantity: number;
-    date: Date;
 }
 
 @Table({ tableName: 'scheduleProducts' })
 export class ScheduleProductsModel extends Model<ScheduleProductsModel, ScheduleProductsCreationAttrs> {
     @Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
     id: number;
-
-    @Column({ type: DataTypes.DATE, allowNull: false })
-    date: Date;
 
     @Column({ type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 })
     quantity: number;

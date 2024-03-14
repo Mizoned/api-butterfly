@@ -31,6 +31,10 @@ export class ProductsService {
         return product;
     }
 
+    async findAllByIds(ids: number[], userId: number) {
+        return await this.productsRepository.findAll({ where: { id: ids, userId }});
+    }
+
     async create(userId: number, productDto: CreateProductDto): Promise<ProductModel> {
         try {
             return await this.productsRepository.create({ ...productDto, userId });

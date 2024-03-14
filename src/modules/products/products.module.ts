@@ -9,6 +9,6 @@ import { ScheduleProductsModel } from '@modules/schedules/models/schedule-produc
   imports: [ SequelizeModule.forFeature([ProductModel, ScheduleProductsModel]) ],
   providers: [ ProductsService ],
   controllers: [ ProductsController ],
-  exports: []
+  exports: [ ProductsService ]
 })
 export class ProductsModule {}
