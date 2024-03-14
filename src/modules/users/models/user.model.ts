@@ -5,6 +5,7 @@ import { CustomerModel } from '@modules/customers/models/customer.model';
 import { ScheduleModel } from '@modules/schedules/models/schedule.model';
 import { TokenModel } from '@modules/tokens/models/token.model';
 import { ExpensesModel } from '@modules/expenses/models/expenses.model';
+import { SettingsModel } from '@modules/settings/models/settings.model';
 
 interface UserCreationAttrs {
     firstName: string;
@@ -40,6 +41,9 @@ export class UserModel extends Model<UserModel, UserCreationAttrs> {
 
     @HasOne(() => TokenModel, 'userId')
     token: TokenModel
+
+    @HasOne(() => SettingsModel, 'userId')
+    settings: SettingsModel
 
     @HasMany(() => CustomerModel, 'userId')
     customers: CustomerModel[];

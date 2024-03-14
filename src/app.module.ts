@@ -9,6 +9,7 @@ import { TokensModule } from '@modules/tokens/tokens.module';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 import { SchedulesModule } from '@modules/schedules/schedules.module';
 import { ExpensesModule } from '@modules/expenses/expenses.module';
+import { SettingsModule } from '@modules/settings/settings.module';
 import { ApiValidationPipe } from '@common/pipes/api-validation.pipe';
 import { AllExceptionsFilter } from '@common/filters/api-exception.filter';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
@@ -40,7 +41,8 @@ import mainConfig from '@common/config/main.config';
       AuthModule,
       TokensModule,
       SchedulesModule,
-      ExpensesModule
+      ExpensesModule,
+      SettingsModule
   ],
   controllers: [],
   providers: [
