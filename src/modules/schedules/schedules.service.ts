@@ -2,13 +2,11 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { ScheduleModel } from '@modules/schedules/models/schedule.model';
 import { ApiException } from '@common/exceptions/api.exception';
 import { CreateScheduleDto } from '@modules/schedules/dto/create-schedule.dto';
-import { UpdateScheduleDto } from '@modules/schedules/dto/update-schedule.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductModel } from '@modules/products/models/product.model';
 import { ProductsService } from '@modules/products/products.service';
 import { SettingsService } from '@modules/settings/settings.service';
 import { CustomersService } from '@modules/customers/customers.service';
-import { ScheduleProductsModel } from '@modules/schedules/models/schedule-products.model';
 
 @Injectable()
 export class SchedulesService {
@@ -32,9 +30,12 @@ export class SchedulesService {
         });
     }
 
-    async findOne(id: number, userId: number): Promise<any> {
-        const schedule = await this.scheduleRepository.findOne({
-            where: { id, userId },
+    async findOne(id: number, userId: number): Promise<ScheduleModel> {
+        return await this.validateScheduleAccess(id, userId);
+    }
+
+    private async validateScheduleAccess(id: number, userId: number): Promise<ScheduleModel> {
+        let schedule = await this.scheduleRepository.findByPk(id, {
             include: {
                 model: ProductModel,
                 through: {
@@ -49,7 +50,7 @@ export class SchedulesService {
         }
 
         if (schedule.userId !== userId) {
-            throw new ApiException('У вас нет прав на просмотр расписания', HttpStatus.FORBIDDEN);
+            throw new ApiException('У вас недостаочно прав', HttpStatus.FORBIDDEN);
         }
 
         return schedule;
@@ -110,7 +111,17 @@ export class SchedulesService {
     }
 
     async create(userId: number, scheduleDto: CreateScheduleDto): Promise<any> {
-        const customer = await this.customersService.findOne(scheduleDto.customerId, userId);
+        const customer = await this.validateCustomer(scheduleDto.customerId, userId);
+
+        const isOccupied = await this.validateTimeSlot(userId, scheduleDto);
+
+        const products = await this.validateProducts(scheduleDto, userId);
+
+        return this.createTransaction(userId, scheduleDto, products);
+    }
+
+    private async validateCustomer(customerId: number, userId: number) {
+        const customer = await this.customersService.findOne(customerId, userId);
 
         if (!customer) {
             throw new ApiException('Ошибка валидации', HttpStatus.BAD_REQUEST, [
@@ -118,10 +129,11 @@ export class SchedulesService {
             ]);
         }
 
-        const userSettings = await this.settingsService.findOne(userId);
-        const startOfDay = this.createScheduleDate(scheduleDto.date, userSettings.workdayStartTime);
-        const endOfDay = this.createScheduleDate(scheduleDto.date, userSettings.workdayEndTime);
+        return customer;
+    }
 
+    private async validateTimeSlot(userId: number, scheduleDto: CreateScheduleDto, excludeScheduleId?: number): Promise<boolean> {
+        const { startOfDay, endOfDay } = await this.getUserWorkdaySettings(userId, scheduleDto.date);
         const scheduleStartDate = this.createScheduleDate(scheduleDto.date, scheduleDto.timeStart);
         const scheduleEndDate = this.createScheduleDate(scheduleDto.date, scheduleDto.timeEnd);
 
@@ -137,13 +149,17 @@ export class SchedulesService {
             ]);
         }
 
-        const schedules: ScheduleModel[] = await this.scheduleRepository.findAll({
-            attributes: ['timeStart', 'timeEnd'],
+        let schedules: ScheduleModel[] = await this.scheduleRepository.findAll({
+            attributes: ['id', 'timeStart', 'timeEnd'],
             where: {
                 date: scheduleDto.date,
                 userId
             }
         });
+
+        if (excludeScheduleId) {
+            schedules = [...schedules].filter((schedule) => schedule.id === excludeScheduleId);
+        }
 
         const isOccupied = this.checkSlotOccupancy(schedules, scheduleDto);
 
@@ -154,16 +170,15 @@ export class SchedulesService {
             ]);
         }
 
-        const productIds = scheduleDto.products.map((product) => product.id);
-        const products: ProductModel[] = await this.productsService.findAllByIds(productIds, userId);
+        return isOccupied;
+    }
 
-        if (!products.length) {
-            throw new ApiException('Ошибка валидации', HttpStatus.BAD_REQUEST, [
-                { property: "products", message: "Указанные услуги не были найдены" }
-            ]);
-        }
+    private async getUserWorkdaySettings(userId: number, date: string) {
+        const userSettings = await this.settingsService.findOne(userId);
+        const startOfDay = this.createScheduleDate(date, userSettings.workdayStartTime);
+        const endOfDay = this.createScheduleDate(date, userSettings.workdayEndTime);
 
-        return this.createTransaction(userId, scheduleDto, products);
+        return { startOfDay, endOfDay };
     }
 
     private checkSlotOccupancy(schedules: Partial<ScheduleModel[]>, scheduleDto: CreateScheduleDto): boolean {
@@ -174,6 +189,19 @@ export class SchedulesService {
                 (scheduleDto.timeStart <= schedule.timeStart && scheduleDto.timeEnd >= schedule.timeEnd)
             );
         });
+    }
+
+    private async validateProducts(scheduleDto: CreateScheduleDto, userId: number): Promise<ProductModel[]> {
+        const productIds = scheduleDto.products.map((product) => product.id);
+        const products: ProductModel[] = await this.productsService.findAllByIds(productIds, userId);
+
+        if (!products.length) {
+            throw new ApiException('Ошибка валидации', HttpStatus.BAD_REQUEST, [
+                { property: "products", message: "Указанные услуги не были найдены" }
+            ]);
+        }
+
+        return products;
     }
 
     private async createTransaction(userId: number, scheduleDto: CreateScheduleDto, products: ProductModel[]): Promise<ScheduleModel> {
@@ -213,23 +241,58 @@ export class SchedulesService {
         }
     }
 
-    async update(id: number, userId: number, scheduleDto: UpdateScheduleDto): Promise<ScheduleModel> {
-        const schedule = await this.scheduleRepository.findByPk(id);
+    async update(id: number, userId: number, scheduleDto: CreateScheduleDto): Promise<any> {
+        const schedule = await this.validateScheduleAccess(id, userId);
 
-        if (!schedule) {
-            throw new ApiException('Расписание не найдено', HttpStatus.NOT_FOUND);
-        }
+        const customer = await this.validateCustomer(scheduleDto.customerId, userId);
 
-        if (schedule.userId !== userId) {
-            throw new ApiException('У вас нет прав на обновление расписаиня', HttpStatus.FORBIDDEN);
-        }
+        const isOccupied = await this.validateTimeSlot(userId, scheduleDto, id);
 
-        try {
-            await schedule.update(scheduleDto);
-            return schedule;
-        } catch (e) {
-            throw new ApiException('Не удалось обновить данные о расписании', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        const products = await this.validateProducts(scheduleDto, userId);
+
+        return await this.updateTransaction(schedule, scheduleDto, products);
+    }
+
+    private async updateTransaction(schedule: ScheduleModel, scheduleDto: CreateScheduleDto, products: ProductModel[]): Promise<any> {
+        const preparedScheduleData = this.prepareUpdateScheduleData(scheduleDto);
+
+        await this.scheduleRepository.sequelize.transaction(async (transaction) => {
+            await schedule.update(preparedScheduleData, { transaction });
+
+            await schedule.$remove<ProductModel>('products', schedule.products);
+
+            for (const product of products) {
+                const productPrice: number = product.price;
+                const productQuantity: number = scheduleDto.products.find((p) => p.id === product.id).quantity;
+
+                await schedule.$add<ProductModel>('products', product, {
+                    through: {
+                        quantity: productQuantity,
+                        priceAtSale: productPrice
+                    },
+                    transaction
+                });
+            }
+        }).then(async () => {
+            await schedule.reload({
+                include: {
+                    model: ProductModel,
+                    through: {
+                        attributes: ['priceAtSale', 'quantity'],
+                        as: 'additional'
+                    }
+                }
+            });
+        }).catch((e) => {
+            throw new ApiException('В процессе обновления записи произошла ошибка', HttpStatus.INTERNAL_SERVER_ERROR);
+        });
+
+        return schedule;
+    }
+
+    private prepareUpdateScheduleData(scheduleDto: CreateScheduleDto) {
+        const { products, ...rest } = scheduleDto;
+        return rest;
     }
 
     async delete(id: number, userId: number): Promise<{ deletedCount: number }> {

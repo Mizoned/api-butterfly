@@ -4,7 +4,6 @@ import { SchedulesService } from '@modules/schedules/schedules.service';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { IJwtPayload } from '@modules/tokens/interfaces/jwt-payload.interface';
 import { CreateScheduleDto } from '@modules/schedules/dto/create-schedule.dto';
-import { UpdateScheduleDto } from '@modules/schedules/dto/update-schedule.dto';
 
 @ApiTags('Расписание пользователя')
 @Controller('schedules')
@@ -31,7 +30,7 @@ export class SchedulesController {
 
     @ApiOperation({ summary: 'Обновление расписания' })
     @Put(':id')
-    async update(@Param('id') id: number, @CurrentUser() user: IJwtPayload, @Body() scheduleDto: UpdateScheduleDto) {
+    async update(@Param('id') id: number, @CurrentUser() user: IJwtPayload, @Body() scheduleDto: CreateScheduleDto) {
         return await this.scheduleService.update(id, user.id, scheduleDto);
     }
 
