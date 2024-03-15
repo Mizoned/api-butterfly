@@ -42,5 +42,5 @@ export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
     customer: CustomerModel;
 
     @BelongsToMany(() => ProductModel, () => ScheduleProductsModel)
-    products: ProductModel[];
+    products: Array<ProductModel & { additional: ScheduleProductsModel }>;
 }

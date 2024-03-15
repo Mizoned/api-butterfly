@@ -13,7 +13,7 @@ export class SettingsService {
         });
     }
 
-    async firstCreate(userId: number, transaction: Transaction) {
+    async firstCreate(userId: number, transaction: Transaction): Promise<SettingsModel> {
         return await this.serviceRepository.create({
             userId
         }, { transaction });

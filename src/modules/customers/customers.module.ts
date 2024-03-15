@@ -8,6 +8,6 @@ import { CustomerModel } from './models/customer.model';
   imports: [ SequelizeModule.forFeature([CustomerModel]) ],
   providers: [ CustomersService ],
   controllers: [ CustomersController ],
-  exports: []
+  exports: [ CustomersService ]
 })
 export class CustomersModule {}

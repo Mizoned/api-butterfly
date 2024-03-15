@@ -6,12 +6,16 @@ import { ScheduleModel } from '@modules/schedules/models/schedule.model';
 import { ScheduleProductsModel } from '@modules/schedules/models/schedule-products.model';
 import { ProductsModule } from '@modules/products/products.module';
 import { UsersModule } from '@modules/users/users.module';
+import { SettingsModule } from '@modules/settings/settings.module';
+import { CustomersModule } from '@modules/customers/customers.module';
 
 @Module({
   imports: [
       SequelizeModule.forFeature([ScheduleModel, ScheduleProductsModel]),
       ProductsModule,
-      UsersModule
+      UsersModule,
+      SettingsModule,
+      CustomersModule
   ],
   providers: [ SchedulesService ],
   controllers: [ SchedulesController ]

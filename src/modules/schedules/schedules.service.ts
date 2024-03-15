@@ -6,23 +6,42 @@ import { UpdateScheduleDto } from '@modules/schedules/dto/update-schedule.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductModel } from '@modules/products/models/product.model';
 import { ProductsService } from '@modules/products/products.service';
+import { SettingsService } from '@modules/settings/settings.service';
+import { CustomersService } from '@modules/customers/customers.service';
+import { ScheduleProductsModel } from '@modules/schedules/models/schedule-products.model';
 
 @Injectable()
 export class SchedulesService {
     constructor(
         @InjectModel(ScheduleModel) private readonly scheduleRepository: typeof ScheduleModel,
-        private readonly productsService: ProductsService
+        private readonly productsService: ProductsService,
+        private readonly settingsService: SettingsService,
+        private readonly customersService: CustomersService,
     ) {}
 
     async findAll(userId: number): Promise<ScheduleModel[]> {
         return this.scheduleRepository.findAll({
-            where: { userId }
+            where: { userId },
+            include: {
+                model: ProductModel,
+                through: {
+                    attributes: ['priceAtSale', 'quantity'],
+                    as: 'additional'
+                }
+            }
         });
     }
 
-    async findOne(id: number, userId: number): Promise<ScheduleModel> {
+    async findOne(id: number, userId: number): Promise<any> {
         const schedule = await this.scheduleRepository.findOne({
-            where: { id, userId }
+            where: { id, userId },
+            include: {
+                model: ProductModel,
+                through: {
+                    attributes: ['priceAtSale', 'quantity'],
+                    as: 'additional'
+                }
+            }
         });
 
         if (!schedule) {
@@ -37,12 +56,9 @@ export class SchedulesService {
     }
 
     async findFreeTimeSlots(userId: number, date: string): Promise<string[]> {
-        //TODO получить настройки пользователя связанные со временем начала дня и его завершения
-        const startOfDay = new Date(date);
-        startOfDay.setHours(8, 0);
-
-        const endOfDay = new Date(date);
-        endOfDay.setHours(18, 0);
+        const userSettings = await this.settingsService.findOne(userId);
+        const startOfDay = this.createScheduleDate(date, userSettings.workdayStartTime);
+        const endOfDay = this.createScheduleDate(date, userSettings.workdayEndTime);
 
         const timeSlots: string[] = [];
         let lastEndTime = new Date(startOfDay);
@@ -94,12 +110,17 @@ export class SchedulesService {
     }
 
     async create(userId: number, scheduleDto: CreateScheduleDto): Promise<any> {
-        //TODO получить настройки пользователя связанные со временем начала дня и его завершения
-        const startOfDay = new Date(scheduleDto.date);
-        startOfDay.setHours(8, 0);
+        const customer = await this.customersService.findOne(scheduleDto.customerId, userId);
 
-        const endOfDay = new Date(scheduleDto.date);
-        endOfDay.setHours(18, 0);
+        if (!customer) {
+            throw new ApiException('Ошибка валидации', HttpStatus.BAD_REQUEST, [
+                { property: "customerId", message: "Клиент не найден" }
+            ]);
+        }
+
+        const userSettings = await this.settingsService.findOne(userId);
+        const startOfDay = this.createScheduleDate(scheduleDto.date, userSettings.workdayStartTime);
+        const endOfDay = this.createScheduleDate(scheduleDto.date, userSettings.workdayEndTime);
 
         const scheduleStartDate = this.createScheduleDate(scheduleDto.date, scheduleDto.timeStart);
         const scheduleEndDate = this.createScheduleDate(scheduleDto.date, scheduleDto.timeEnd);
@@ -119,7 +140,8 @@ export class SchedulesService {
         const schedules: ScheduleModel[] = await this.scheduleRepository.findAll({
             attributes: ['timeStart', 'timeEnd'],
             where: {
-                date: scheduleDto.date
+                date: scheduleDto.date,
+                userId
             }
         });
 
