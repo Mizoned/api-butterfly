@@ -53,7 +53,7 @@ export class AuthController {
 
     @ApiOperation({ summary: 'Выход из системы' })
     @ApiResponse({ status: 200 })
-    @Get('/logout')
+    @Post('/logout')
     async logout(@Cookie(REFRESH_TOKEN) refreshToken: string, @Res() response: Response) {
         if (!refreshToken) {
             response.sendStatus(HttpStatus.OK);

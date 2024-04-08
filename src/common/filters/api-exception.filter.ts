@@ -30,7 +30,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
                 statusCode: httpStatus,
             }
         } else {
-            // console.log(exception)
             httpStatus =
                 exception instanceof HttpException
                     ? exception.getStatus()

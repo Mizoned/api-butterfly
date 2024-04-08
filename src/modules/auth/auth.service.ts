@@ -1,4 +1,4 @@
-import { ConflictException, HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '@modules/users/users.service';
 import { UserModel } from '@modules/users/models/user.model';
 import { TokensService } from '@modules/tokens/tokens.service';
@@ -6,6 +6,7 @@ import LoginUserDto from '@modules/auth/dto/login-user.dto';
 import RegisterUserDto from '@modules/auth/dto/register-user.dto';
 import { ITokens } from '@modules/tokens/interfaces/tokens.interface';
 import * as bcrypt from "bcrypt";
+import { ApiException } from "@common/exceptions/api.exception";
 
 @Injectable()
 export class AuthService {
@@ -18,13 +19,23 @@ export class AuthService {
         const candidate: UserModel = await this.usersService.findOneByEmail(userDto.email);
 
         if (!candidate) {
-            throw new HttpException('Пользователь не зарегистрирован', HttpStatus.BAD_REQUEST);
+            throw new ApiException('Ошибка авторизации', HttpStatus.BAD_REQUEST, [
+                {
+                    property: 'email',
+                    message: 'Пользователь не зарегистрирован'
+                }
+            ]);
         }
 
         const isCompared = await this.comparePassword(userDto.password, candidate.password);
 
         if (!isCompared) {
-            throw new HttpException('Неправильный логин или пароль', HttpStatus.BAD_REQUEST);
+            throw new ApiException('Ошибка авторизации', HttpStatus.BAD_REQUEST, [
+                {
+                    property: 'password',
+                    message: 'Неправильный логин или пароль'
+                }
+            ]);
         }
 
         return await this.tokensService.processGenerateTokens(candidate);
@@ -34,7 +45,12 @@ export class AuthService {
         const candidate: UserModel = await this.usersService.findOneByEmail(userDto.email);
 
         if (candidate) {
-            throw new ConflictException('Пользователь с таким email уже зарегистрирован');
+            throw new ApiException('Ошибка авторизации', HttpStatus.CONFLICT, [
+                {
+                    property: 'email',
+                    message: 'Пользователь с таким email уже зарегистрирован'
+                }
+            ]);
         }
 
         const hashedPassword = await this.hashPassword(userDto.password);
@@ -45,7 +61,7 @@ export class AuthService {
         });
 
         if (!newUser) {
-            throw new InternalServerErrorException('Произошла непредвиденная ошибка!');
+            throw new ApiException('Ошибка авторизации', HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return await this.tokensService.processGenerateTokens(newUser);
@@ -59,13 +75,13 @@ export class AuthService {
         const tokenModel = await this.tokensService.findRefreshToken(refreshToken);
 
         if (!tokenModel || !tokenModel.token) {
-            throw new HttpException('Доступ к ресурсу запрещен', HttpStatus.FORBIDDEN);
+            throw new ApiException('Доступ к ресурсу запрещен', HttpStatus.FORBIDDEN);
         }
 
         const refreshTokenMatches = await this.tokensService.validateRefreshToken(tokenModel.token);
 
         if (!refreshTokenMatches) {
-            throw new HttpException('Доступ к ресурсу запрещен', HttpStatus.FORBIDDEN);
+            throw new ApiException('Доступ к ресурсу запрещен', HttpStatus.FORBIDDEN);
         }
 
         const user = await this.usersService.findOne(tokenModel.userId);
@@ -80,6 +96,4 @@ export class AuthService {
     private async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
         return await bcrypt.compare(password, hashedPassword);
     }
-
-
 }
