@@ -13,7 +13,17 @@ export class SchedulesController {
     @ApiOperation({ summary: 'Получение всех расписаний' })
     @Get('/')
     async findAll(@CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.findAll(user.id)
+        return await this.scheduleService.findAll(user.id);
+    }
+
+    @Get('/completed')
+    async findAllCompleted(@CurrentUser() user: IJwtPayload) {
+        return await this.scheduleService.findAllCompleted(user.id);
+    }
+
+    @Get('/canceled')
+    async findAllCanceled(@CurrentUser() user: IJwtPayload) {
+        return await this.scheduleService.findAllCanceled(user.id);
     }
 
     @ApiOperation({ summary: 'Получение расписания по id' })
@@ -40,9 +50,21 @@ export class SchedulesController {
         return await this.scheduleService.delete(id, user.id);
     }
 
+    @ApiOperation({ summary: 'Отменить запись'})
+    @Put('/cancel/:id')
+    async cancel(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
+        return await this.scheduleService.cancel(id, user.id);
+    }
+
+    @ApiOperation({ summary: 'Отменить запись'})
+    @Put('/complete/:id')
+    async complete(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
+        return await this.scheduleService.compete(id, user.id);
+    }
+
     @ApiOperation({ summary: 'Получение свободных слотов по выбранной дате' })
-    @Get('slots/free')
-    async findFreeTimeSlots(@Body() obj: { date: string }, @CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.findFreeTimeSlots(user.id, obj.date);
+    @Get('slots/free/:date')
+    async findFreeTimeSlots(@Param('date') date: string, @CurrentUser() user: IJwtPayload) {
+        return await this.scheduleService.findFreeTimeSlots(user.id, date);
     }
 }

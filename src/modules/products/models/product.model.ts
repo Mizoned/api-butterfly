@@ -10,6 +10,11 @@ interface ProductCreationAttrs {
     userId: number;
 }
 
+export enum StatusProduct {
+    DELETED = 'DELETED',
+    ACTIVE = 'ACTIVE'
+}
+
 @Table({ tableName: 'products' })
 export class ProductModel extends Model<ProductModel, ProductCreationAttrs> {
     @Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
@@ -20,6 +25,9 @@ export class ProductModel extends Model<ProductModel, ProductCreationAttrs> {
 
     @Column({ type: DataTypes.FLOAT, allowNull: false })
     price: number;
+
+    @Column({ type: DataTypes.ENUM(...Object.values(StatusProduct)), defaultValue: StatusProduct.ACTIVE })
+    status: string;
 
     @ForeignKey(() => UserModel)
     @Column({ type: DataTypes.INTEGER })

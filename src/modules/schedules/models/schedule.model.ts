@@ -13,6 +13,12 @@ interface ScheduleCreationAttrs {
     timeEnd: string;
 }
 
+export enum StatusSchedule {
+    SUCCESS = 'SUCCESS',
+    CANCELED = 'CANCELED',
+    PROCESS = 'PROCESS'
+}
+
 @Table({ tableName: 'schedules' })
 export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
     @Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
@@ -26,6 +32,9 @@ export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
 
     @Column({ type: DataTypes.STRING, allowNull: false })
     timeEnd: string;
+
+    @Column({ type: DataTypes.ENUM(...Object.values(StatusSchedule)), defaultValue: StatusSchedule.PROCESS })
+    status: string;
 
     @ForeignKey(() => UserModel)
     @Column({ type: DataTypes.INTEGER, allowNull: false })
@@ -43,4 +52,5 @@ export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
 
     @BelongsToMany(() => ProductModel, () => ScheduleProductsModel)
     products: Array<(ProductModel & { additional: ScheduleProductsModel }) | (ProductModel & { ScheduleProductsModel: ScheduleProductsModel })>;
+
 }

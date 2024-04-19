@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ScheduleModel } from '@modules/schedules/models/schedule.model';
+import {ScheduleModel, StatusSchedule} from '@modules/schedules/models/schedule.model';
 import { ApiException } from '@common/exceptions/api.exception';
 import { CreateScheduleDto } from '@modules/schedules/dto/create-schedule.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -7,6 +7,7 @@ import { ProductModel } from '@modules/products/models/product.model';
 import { ProductsService } from '@modules/products/products.service';
 import { SettingsService } from '@modules/settings/settings.service';
 import { CustomersService } from '@modules/customers/customers.service';
+import {CustomerModel} from "@modules/customers/models/customer.model";
 
 @Injectable()
 export class SchedulesService {
@@ -19,14 +20,55 @@ export class SchedulesService {
 
     async findAll(userId: number): Promise<ScheduleModel[]> {
         return this.scheduleRepository.findAll({
-            where: { userId },
-            include: {
-                model: ProductModel,
-                through: {
-                    attributes: ['priceAtSale', 'quantity'],
-                    as: 'additional'
+            where: { userId, status: StatusSchedule.PROCESS },
+            include: [
+                {
+                    model: CustomerModel
+                },
+                {
+                    model: ProductModel,
+                    through: {
+                        attributes: ['priceAtSale', 'quantity'],
+                        as: 'additional'
+                    }
                 }
-            }
+            ]
+        });
+    }
+
+    async findAllCompleted(userId: number): Promise<ScheduleModel[]> {
+        return this.scheduleRepository.findAll({
+            where: { userId, status: StatusSchedule.SUCCESS },
+            include: [
+                {
+                    model: CustomerModel
+                },
+                {
+                    model: ProductModel,
+                    through: {
+                        attributes: ['priceAtSale', 'quantity'],
+                        as: 'additional'
+                    }
+                }
+            ]
+        });
+    }
+
+    async findAllCanceled(userId: number): Promise<ScheduleModel[]> {
+        return this.scheduleRepository.findAll({
+            where: { userId, status: StatusSchedule.CANCELED },
+            include: [
+                {
+                    model: CustomerModel
+                },
+                {
+                    model: ProductModel,
+                    through: {
+                        attributes: ['priceAtSale', 'quantity'],
+                        as: 'additional'
+                    }
+                }
+            ]
         });
     }
 
@@ -36,13 +78,18 @@ export class SchedulesService {
 
     private async validateScheduleAccess(id: number, userId: number): Promise<ScheduleModel> {
         let schedule = await this.scheduleRepository.findByPk(id, {
-            include: {
-                model: ProductModel,
-                through: {
-                    attributes: ['priceAtSale', 'quantity'],
-                    as: 'additional'
+            include: [
+                {
+                    model: CustomerModel
+                },
+                {
+                    model: ProductModel,
+                    through: {
+                        attributes: ['priceAtSale', 'quantity'],
+                        as: 'additional'
+                    }
                 }
-            }
+            ]
         });
 
         if (!schedule) {
@@ -117,7 +164,9 @@ export class SchedulesService {
 
         const products = await this.validateProducts(scheduleDto, userId);
 
-        return this.createTransaction(userId, scheduleDto, products);
+        const { id: scheduleId } = await this.createTransaction(userId, scheduleDto, products);
+
+        return this.findOne(scheduleId, userId);
     }
 
     private async validateCustomer(customerId: number, userId: number) {
@@ -250,7 +299,9 @@ export class SchedulesService {
 
         const products = await this.validateProducts(scheduleDto, userId);
 
-        return await this.updateTransaction(schedule, scheduleDto, products);
+        const { id: scheduleId } = await this.updateTransaction(schedule, scheduleDto, products);
+
+        return this.findOne(scheduleId, userId);
     }
 
     private async updateTransaction(schedule: ScheduleModel, scheduleDto: CreateScheduleDto, products: ProductModel[]): Promise<any> {
@@ -293,6 +344,24 @@ export class SchedulesService {
     private prepareUpdateScheduleData(scheduleDto: CreateScheduleDto) {
         const { products, ...rest } = scheduleDto;
         return rest;
+    }
+
+    async cancel(id: number, userId: number) {
+        const schedule = await this.validateScheduleAccess(id, userId);
+        const customer = await this.validateCustomer(schedule.customerId, userId);
+
+        await schedule.update({ status: StatusSchedule.CANCELED });
+
+        return schedule;
+    }
+
+    async compete(id: number, userId: number) {
+        const schedule = await this.validateScheduleAccess(id, userId);
+        const customer = await this.validateCustomer(schedule.customerId, userId);
+
+        await schedule.update({ status: StatusSchedule.SUCCESS });
+
+        return schedule;
     }
 
     async delete(id: number, userId: number): Promise<{ deletedCount: number }> {

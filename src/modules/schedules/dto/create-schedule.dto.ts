@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDateString, IsNotEmpty, IsNumber } from 'class-validator';
+import {IsArray, IsDateString, IsNotEmpty, IsNumber, IsString} from 'class-validator';
 import { VALIDATION_ERROR } from '@constants/messages/validation';
 import { IsTime, IsArrayNotEmpty, IsEndTimeLaterThanStartTime } from "@common/validators";
 

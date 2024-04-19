@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { ProductModel } from './models/product.model';
+import {ProductModel, StatusProduct} from './models/product.model';
 import { CreateProductDto } from '@modules/products/dto/create-product.dto';
 import { UpdateProductDto } from '@modules/products/dto/update-product.dto';
 import { ApiException } from '@common/exceptions/api.exception';
@@ -11,13 +11,13 @@ export class ProductsService {
 
     async findAll(userId: number): Promise<ProductModel[]> {
         return this.productsRepository.findAll({
-            where: { userId }
+            where: { userId, status: StatusProduct.ACTIVE }
         });
     }
 
     async findOne(id: number, userId: number): Promise<ProductModel> {
         const product = await this.productsRepository.findOne({
-            where: { id, userId }
+            where: { id, userId, status: StatusProduct.ACTIVE }
         });
 
         if (!product) {

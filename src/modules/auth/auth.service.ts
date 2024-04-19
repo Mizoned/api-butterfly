@@ -22,7 +22,7 @@ export class AuthService {
             throw new ApiException('Ошибка авторизации', HttpStatus.BAD_REQUEST, [
                 {
                     property: 'email',
-                    message: 'Пользователь не зарегистрирован'
+                    message: 'Пользователь c таким электронным адресом не зарегистрирован'
                 }
             ]);
         }

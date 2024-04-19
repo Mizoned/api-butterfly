@@ -32,7 +32,7 @@ export class CustomersService {
     }
 
     async create(userId: number, customerDto: CreateCustomerDto): Promise<CustomerModel> {
-        const candidateCustomer = await this.customersRepository.findOne({ where: { mobilePhone: customerDto.mobilePhone } });
+        const candidateCustomer = await this.customersRepository.findOne({ where: { mobilePhone: customerDto.mobilePhone, userId } });
 
         if (candidateCustomer) {
             throw new ApiException('Ошибка валидации', HttpStatus.BAD_REQUEST, [

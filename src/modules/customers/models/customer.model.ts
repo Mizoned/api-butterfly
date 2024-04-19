@@ -26,7 +26,7 @@ export class CustomerModel extends Model<CustomerModel, CustomerCreationAttrs> {
     @Column({ type: DataTypes.STRING })
     fatherName: string;
 
-    @Column({ type: DataTypes.STRING, allowNull: false, unique: true })
+    @Column({ type: DataTypes.STRING, allowNull: false })
     mobilePhone: string;
 
     @Column({ type: DataTypes.STRING })
