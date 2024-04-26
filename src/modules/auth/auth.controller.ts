@@ -7,6 +7,7 @@ import RegisterUserDto from '@modules/auth/dto/register-user.dto';
 import { Cookie } from '@common/decorators/cookies.decorator';
 import { Response } from 'express';
 import { Public } from '@common/decorators/public.decorator';
+import {ResponseUserDto} from "@modules/users/response/response-user.dto";
 
 const REFRESH_TOKEN = 'refreshToken';
 
@@ -20,12 +21,12 @@ export class AuthController {
     @ApiResponse({ status: 200 })
     @Post('/sign-in')
     async signIn(@Body() userDto: LoginUserDto, @Res() response: Response) {
-        const tokens = await this.authService.signIn(userDto);
+        const { tokens, user} = await this.authService.signIn(userDto);
 
-        this.setRefreshTokenToCookies(tokens, response);
+        this.setRefreshTokenToCookies(tokens, user, response);
     }
 
-    private setRefreshTokenToCookies(tokens: ITokens, response: Response) {
+    private setRefreshTokenToCookies(tokens: ITokens, user: ResponseUserDto, response: Response) {
         if (!tokens) {
             throw new HttpException('Пользователь не авторизован', HttpStatus.UNAUTHORIZED);
         }
@@ -39,16 +40,16 @@ export class AuthController {
         });
 
         response.status(HttpStatus.OK);
-        response.json({ accessToken: tokens.accessToken.token });
+        response.json({ accessToken: tokens.accessToken.token, user });
     }
 
     @ApiOperation({ summary: 'Регистрация' })
     @ApiResponse({ status: 200 })
     @Post('/sign-up')
     async signUp(@Body() userDto: RegisterUserDto, @Res() response: Response) {
-        const tokens = await this.authService.signUp(userDto);
+        const { tokens, user } = await this.authService.signUp(userDto);
 
-        this.setRefreshTokenToCookies(tokens, response);
+        this.setRefreshTokenToCookies(tokens, user, response);
     }
 
     @ApiOperation({ summary: 'Выход из системы' })
@@ -78,8 +79,8 @@ export class AuthController {
             throw new HttpException('Пользователь не авторизован', HttpStatus.UNAUTHORIZED);
         }
 
-        const tokens: ITokens = await this.authService.refresh(refreshToken);
+        const { tokens, user } = await this.authService.refresh(refreshToken);
 
-        this.setRefreshTokenToCookies(tokens, response);
+        this.setRefreshTokenToCookies(tokens, user, response);
     }
 }

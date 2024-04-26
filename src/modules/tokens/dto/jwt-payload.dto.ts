@@ -1,5 +1,6 @@
 import { UserModel } from '@modules/users/models/user.model';
 import { IJwtPayload } from '@modules/tokens/interfaces/jwt-payload.interface';
+import { SettingsDto } from "@modules/settings/dto/settings.dto";
 
 export class JwtPayloadDto implements IJwtPayload {
     id: number;
@@ -8,6 +9,7 @@ export class JwtPayloadDto implements IJwtPayload {
     fatherName?: string;
     email: string;
     mobilePhone?: string;
+    settings: SettingsDto;
 
     public static getObjectByUserModel(user: UserModel): IJwtPayload {
         return {
@@ -16,7 +18,11 @@ export class JwtPayloadDto implements IJwtPayload {
             lastName: user.lastName,
             fatherName: user.fatherName,
             email: user.email,
-            mobilePhone: user.mobilePhone
+            mobilePhone: user.mobilePhone,
+            settings: {
+                workdayStartTime: user.settings.workdayStartTime,
+                workdayEndTime: user.settings.workdayEndTime,
+            }
         }
     }
 }

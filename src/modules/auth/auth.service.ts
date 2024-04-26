@@ -7,6 +7,9 @@ import RegisterUserDto from '@modules/auth/dto/register-user.dto';
 import { ITokens } from '@modules/tokens/interfaces/tokens.interface';
 import * as bcrypt from "bcrypt";
 import { ApiException } from "@common/exceptions/api.exception";
+import {SettingsService} from "@modules/settings/settings.service";
+import {ResponseUserDto} from "@modules/users/response/response-user.dto";
+import {AuthResponse} from "@modules/auth/response/auth-response.dto";
 
 @Injectable()
 export class AuthService {
@@ -15,7 +18,7 @@ export class AuthService {
         private readonly tokensService: TokensService
     ) {}
 
-    async signIn(userDto: LoginUserDto): Promise<ITokens> {
+    async signIn(userDto: LoginUserDto): Promise<{ tokens: ITokens, user: ResponseUserDto }> {
         const candidate: UserModel = await this.usersService.findOneByEmail(userDto.email);
 
         if (!candidate) {
@@ -38,10 +41,12 @@ export class AuthService {
             ]);
         }
 
-        return await this.tokensService.processGenerateTokens(candidate);
+        const tokens = await this.tokensService.processGenerateTokens(candidate);
+
+        return { tokens, user: ResponseUserDto.createResponseUser(candidate) };
     }
 
-    async signUp(userDto: RegisterUserDto): Promise<ITokens> {
+    async signUp(userDto: RegisterUserDto): Promise<{tokens: ITokens, user: ResponseUserDto}> {
         const candidate: UserModel = await this.usersService.findOneByEmail(userDto.email);
 
         if (candidate) {
@@ -64,14 +69,16 @@ export class AuthService {
             throw new ApiException('Ошибка авторизации', HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return await this.tokensService.processGenerateTokens(newUser);
+        const tokens = await this.tokensService.processGenerateTokens(newUser);
+
+        return { tokens, user: ResponseUserDto.createResponseUser(newUser) };
     }
 
     async logout(refreshToken: string): Promise<boolean> {
         return this.tokensService.delete(refreshToken);
     }
 
-    async refresh(refreshToken: string): Promise<ITokens> {
+    async refresh(refreshToken: string): Promise<AuthResponse> {
         const tokenModel = await this.tokensService.findRefreshToken(refreshToken);
 
         if (!tokenModel || !tokenModel.token) {
@@ -86,7 +93,9 @@ export class AuthService {
 
         const user = await this.usersService.findOne(tokenModel.userId);
 
-        return await this.tokensService.processGenerateTokens(user);
+        const tokens = await this.tokensService.processGenerateTokens(user);
+
+        return { tokens, user: ResponseUserDto.createResponseUser(user) };
     }
 
     private async hashPassword(password: string): Promise<string> {
