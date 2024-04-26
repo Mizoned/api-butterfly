@@ -6,51 +6,56 @@ import { ProductModel } from '@modules/products/models/product.model';
 import { ScheduleProductsModel } from '@modules/schedules/models/schedule-products.model';
 
 interface ScheduleCreationAttrs {
-    userId: number;
-    customerId: number;
-    date: string;
-    timeStart: string;
-    timeEnd: string;
+	userId: number;
+	customerId: number;
+	date: string;
+	timeStart: string;
+	timeEnd: string;
 }
 
 export enum StatusSchedule {
-    SUCCESS = 'SUCCESS',
-    CANCELED = 'CANCELED',
-    PROCESS = 'PROCESS'
+	SUCCESS = 'SUCCESS',
+	CANCELED = 'CANCELED',
+	PROCESS = 'PROCESS'
 }
 
 @Table({ tableName: 'schedules' })
 export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
-    @Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
-    id: number;
+	@Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
+	id: number;
 
-    @Column({ type: DataTypes.DATEONLY, allowNull: false })
-    date: string;
+	@Column({ type: DataTypes.DATEONLY, allowNull: false })
+	date: string;
 
-    @Column({ type: DataTypes.STRING, allowNull: false })
-    timeStart: string;
+	@Column({ type: DataTypes.STRING, allowNull: false })
+	timeStart: string;
 
-    @Column({ type: DataTypes.STRING, allowNull: false })
-    timeEnd: string;
+	@Column({ type: DataTypes.STRING, allowNull: false })
+	timeEnd: string;
 
-    @Column({ type: DataTypes.ENUM(...Object.values(StatusSchedule)), defaultValue: StatusSchedule.PROCESS })
-    status: string;
+	@Column({
+		type: DataTypes.ENUM(...Object.values(StatusSchedule)),
+		defaultValue: StatusSchedule.PROCESS
+	})
+	status: string;
 
-    @ForeignKey(() => UserModel)
-    @Column({ type: DataTypes.INTEGER, allowNull: false })
-    userId: number;
+	@ForeignKey(() => UserModel)
+	@Column({ type: DataTypes.INTEGER, allowNull: false })
+	userId: number;
 
-    @BelongsTo(() => UserModel, 'userId')
-    user: UserModel;
+	@BelongsTo(() => UserModel, 'userId')
+	user: UserModel;
 
-    @ForeignKey(() => CustomerModel)
-    @Column({ type: DataTypes.INTEGER, allowNull: false })
-    customerId: number;
+	@ForeignKey(() => CustomerModel)
+	@Column({ type: DataTypes.INTEGER, allowNull: false })
+	customerId: number;
 
-    @BelongsTo(() => CustomerModel, 'customerId')
-    customer: CustomerModel;
+	@BelongsTo(() => CustomerModel, 'customerId')
+	customer: CustomerModel;
 
-    @BelongsToMany(() => ProductModel, () => ScheduleProductsModel)
-    products: Array<(ProductModel & { additional: ScheduleProductsModel }) | (ProductModel & { ScheduleProductsModel: ScheduleProductsModel })>;
-
+	@BelongsToMany(() => ProductModel, () => ScheduleProductsModel)
+	products: Array<
+		| (ProductModel & { additional: ScheduleProductsModel })
+		| (ProductModel & { ScheduleProductsModel: ScheduleProductsModel })
+	>;
 }

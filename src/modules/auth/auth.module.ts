@@ -6,12 +6,8 @@ import { TokensModule } from '@modules/tokens/tokens.module';
 import { AccessTokenStrategy } from '@modules/auth/strategies/accessToken.strategy';
 
 @Module({
-    imports: [
-        UsersModule,
-        TokensModule
-    ],
-    providers: [ AuthService, AccessTokenStrategy ],
-    controllers: [ AuthController ]
+	imports: [UsersModule, TokensModule],
+	providers: [AuthService, AccessTokenStrategy],
+	controllers: [AuthController]
 })
-export class AuthModule {
-}
+export class AuthModule {}

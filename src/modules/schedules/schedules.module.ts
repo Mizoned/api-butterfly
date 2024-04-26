@@ -10,14 +10,14 @@ import { SettingsModule } from '@modules/settings/settings.module';
 import { CustomersModule } from '@modules/customers/customers.module';
 
 @Module({
-  imports: [
-      SequelizeModule.forFeature([ScheduleModel, ScheduleProductsModel]),
-      ProductsModule,
-      UsersModule,
-      SettingsModule,
-      CustomersModule
-  ],
-  providers: [ SchedulesService ],
-  controllers: [ SchedulesController ]
+	imports: [
+		SequelizeModule.forFeature([ScheduleModel, ScheduleProductsModel]),
+		ProductsModule,
+		UsersModule,
+		SettingsModule,
+		CustomersModule
+	],
+	providers: [SchedulesService],
+	controllers: [SchedulesController]
 })
 export class SchedulesModule {}

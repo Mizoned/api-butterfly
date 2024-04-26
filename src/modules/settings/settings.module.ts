@@ -5,9 +5,9 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { SettingsModel } from '@modules/settings/models/settings.model';
 
 @Module({
-  imports: [ SequelizeModule.forFeature([ SettingsModel ]) ],
-  controllers: [ SettingsController ],
-  providers: [ SettingsService ],
-  exports: [ SettingsService ]
+	imports: [SequelizeModule.forFeature([SettingsModel])],
+	controllers: [SettingsController],
+	providers: [SettingsService],
+	exports: [SettingsService]
 })
 export class SettingsModule {}

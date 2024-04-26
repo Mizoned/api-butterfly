@@ -1,4 +1,4 @@
 export interface IToken {
-    token: string;
-    exp: Date
+	token: string;
+	exp: Date;
 }

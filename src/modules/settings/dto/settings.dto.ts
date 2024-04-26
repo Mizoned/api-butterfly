@@ -1,4 +1,4 @@
 export class SettingsDto {
-    workdayStartTime: string
-    workdayEndTime: string
+	workdayStartTime: string;
+	workdayEndTime: string;
 }

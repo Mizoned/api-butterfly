@@ -5,11 +5,8 @@ import { TokenModel } from '@modules/tokens/models/token.model';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-    imports: [
-        SequelizeModule.forFeature([ TokenModel ]),
-        JwtModule.register({})
-    ],
-    providers: [ TokensService ],
-    exports: [ TokensService ]
+	imports: [SequelizeModule.forFeature([TokenModel]), JwtModule.register({})],
+	providers: [TokensService],
+	exports: [TokensService]
 })
 export class TokensModule {}

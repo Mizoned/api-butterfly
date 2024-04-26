@@ -8,63 +8,67 @@ import { CreateScheduleDto } from '@modules/schedules/dto/create-schedule.dto';
 @ApiTags('Расписание пользователя')
 @Controller('schedules')
 export class SchedulesController {
-    constructor(private readonly scheduleService: SchedulesService) {}
+	constructor(private readonly scheduleService: SchedulesService) {}
 
-    @ApiOperation({ summary: 'Получение всех расписаний' })
-    @Get('/')
-    async findAll(@CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.findAll(user.id);
-    }
+	@ApiOperation({ summary: 'Получение всех расписаний' })
+	@Get('/')
+	async findAll(@CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.findAll(user.id);
+	}
 
-    @Get('/completed')
-    async findAllCompleted(@CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.findAllCompleted(user.id);
-    }
+	@Get('/completed')
+	async findAllCompleted(@CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.findAllCompleted(user.id);
+	}
 
-    @Get('/canceled')
-    async findAllCanceled(@CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.findAllCanceled(user.id);
-    }
+	@Get('/canceled')
+	async findAllCanceled(@CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.findAllCanceled(user.id);
+	}
 
-    @ApiOperation({ summary: 'Получение расписания по id' })
-    @Get(':id')
-    async findOne(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.findOne(id, user.id);
-    }
+	@ApiOperation({ summary: 'Получение расписания по id' })
+	@Get(':id')
+	async findOne(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.findOne(id, user.id);
+	}
 
-    @ApiOperation({ summary: 'Создание расписания' })
-    @Post('/')
-    async create(@CurrentUser() user: IJwtPayload, @Body() scheduleDto: CreateScheduleDto) {
-        return await this.scheduleService.create(user.id, scheduleDto);
-    }
+	@ApiOperation({ summary: 'Создание расписания' })
+	@Post('/')
+	async create(@CurrentUser() user: IJwtPayload, @Body() scheduleDto: CreateScheduleDto) {
+		return await this.scheduleService.create(user.id, scheduleDto);
+	}
 
-    @ApiOperation({ summary: 'Обновление расписания' })
-    @Put(':id')
-    async update(@Param('id') id: number, @CurrentUser() user: IJwtPayload, @Body() scheduleDto: CreateScheduleDto) {
-        return await this.scheduleService.update(id, user.id, scheduleDto);
-    }
+	@ApiOperation({ summary: 'Обновление расписания' })
+	@Put(':id')
+	async update(
+		@Param('id') id: number,
+		@CurrentUser() user: IJwtPayload,
+		@Body() scheduleDto: CreateScheduleDto
+	) {
+		return await this.scheduleService.update(id, user.id, scheduleDto);
+	}
 
-    @ApiOperation({ summary: 'Удаление расписания' })
-    @Delete(':id')
-    async delete(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.delete(id, user.id);
-    }
+	@ApiOperation({ summary: 'Удаление расписания' })
+	@Delete(':id')
+	async delete(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.delete(id, user.id);
+	}
 
-    @ApiOperation({ summary: 'Отменить запись'})
-    @Put('/cancel/:id')
-    async cancel(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.cancel(id, user.id);
-    }
+	@ApiOperation({ summary: 'Отменить запись' })
+	@Put('/cancel/:id')
+	async cancel(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.cancel(id, user.id);
+	}
 
-    @ApiOperation({ summary: 'Отменить запись'})
-    @Put('/complete/:id')
-    async complete(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.compete(id, user.id);
-    }
+	@ApiOperation({ summary: 'Отменить запись' })
+	@Put('/complete/:id')
+	async complete(@Param('id') id: number, @CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.compete(id, user.id);
+	}
 
-    @ApiOperation({ summary: 'Получение свободных слотов по выбранной дате' })
-    @Get('slots/free/:date')
-    async findFreeTimeSlots(@Param('date') date: string, @CurrentUser() user: IJwtPayload) {
-        return await this.scheduleService.findFreeTimeSlots(user.id, date);
-    }
+	@ApiOperation({ summary: 'Получение свободных слотов по выбранной дате' })
+	@Get('slots/free/:date')
+	async findFreeTimeSlots(@Param('date') date: string, @CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.findFreeTimeSlots(user.id, date);
+	}
 }

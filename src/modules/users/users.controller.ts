@@ -5,11 +5,11 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 @ApiTags('Пользователи')
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService) {}
+	constructor(private readonly usersService: UsersService) {}
 
-    @ApiOperation({ summary: 'Получение пользователя по id' })
-    @Get('/:id')
-    async findOne(@Param('id') id: number) {
-        return await this.usersService.findOne(id);
-    }
+	@ApiOperation({ summary: 'Получение пользователя по id' })
+	@Get('/:id')
+	async findOne(@Param('id') id: number) {
+		return await this.usersService.findOne(id);
+	}
 }

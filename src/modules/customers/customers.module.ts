@@ -5,9 +5,9 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { CustomerModel } from './models/customer.model';
 
 @Module({
-  imports: [ SequelizeModule.forFeature([CustomerModel]) ],
-  providers: [ CustomersService ],
-  controllers: [ CustomersController ],
-  exports: [ CustomersService ]
+	imports: [SequelizeModule.forFeature([CustomerModel])],
+	providers: [CustomersService],
+	controllers: [CustomersController],
+	exports: [CustomersService]
 })
 export class CustomersModule {}

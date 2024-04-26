@@ -5,8 +5,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { ExpensesModel } from '@modules/expenses/models/expenses.model';
 
 @Module({
-  imports: [ SequelizeModule.forFeature([ ExpensesModel ]) ],
-  providers: [ExpensesService],
-  controllers: [ExpensesController]
+	imports: [SequelizeModule.forFeature([ExpensesModel])],
+	providers: [ExpensesService],
+	controllers: [ExpensesController]
 })
 export class ExpensesModule {}
