@@ -7,10 +7,14 @@ import { SettingsModel } from '@modules/settings/models/settings.model';
 import { SettingsModule } from '@modules/settings/settings.module';
 import { UserController } from '@modules/users/user.controller';
 import { UserService } from '@modules/users/user.service';
+import { FilesService } from "@modules/files/files.service";
 
 @Module({
-	imports: [SequelizeModule.forFeature([UserModel, SettingsModel]), SettingsModule],
-	providers: [UsersService, UserService],
+	imports: [
+		SequelizeModule.forFeature([UserModel, SettingsModel]),
+		SettingsModule,
+	],
+	providers: [UsersService, UserService, FilesService],
 	controllers: [UsersController, UserController],
 	exports: [UsersService, UserService]
 })

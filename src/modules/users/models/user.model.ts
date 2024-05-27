@@ -12,6 +12,7 @@ interface UserCreationAttrs {
 	lastName: string;
 	fatherName: string;
 	mobilePhone: string;
+	avatar?: string;
 	email: string;
 	password: string;
 }
@@ -32,6 +33,9 @@ export class UserModel extends Model<UserModel, UserCreationAttrs> {
 
 	@Column({ type: DataTypes.STRING, allowNull: true })
 	mobilePhone: string;
+
+	@Column({ type: DataTypes.STRING, allowNull: true })
+	avatar: string;
 
 	@Column({ type: DataTypes.STRING, unique: true, allowNull: true })
 	email: string;

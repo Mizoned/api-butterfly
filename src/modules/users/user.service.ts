@@ -9,12 +9,15 @@ import { ResponseUserDto } from '@modules/users/response/response-user.dto';
 import { UpdatePasswordDto } from '@modules/users/dto/update-password.dto';
 import { SettingsService } from '@modules/settings/settings.service';
 import { UpdateWorkspaceDto } from '@modules/users/dto/update-workspace.dto';
+import { FilesService } from '@modules/files/files.service';
+import { FileType } from "@modules/files/types";
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectModel(UserModel) private readonly usersRepository: typeof UserModel,
-		private readonly settingsService: SettingsService
+		private readonly settingsService: SettingsService,
+		private readonly filesService: FilesService
 	) {}
 
 	async me(id: number): Promise<ResponseUserDto> {
@@ -78,6 +81,44 @@ export class UserService {
 
 		await user.update({
 			password: hashedPassword
+		});
+
+		return ResponseUserDto.createResponseUser(user);
+	}
+
+	async updateAvatar(id: number, file: Express.Multer.File) {
+		const user = await this.usersRepository.findOne({
+			where: { id },
+			include: {
+				model: SettingsModel
+			}
+		});
+
+		if (user.avatar) {
+			this.filesService.removeFile(user.avatar);
+		}
+
+		const fileName = this.filesService.createFile(FileType.AVATAR, file)
+
+		await user.update({
+			avatar: fileName
+		});
+
+		return ResponseUserDto.createResponseUser(user);
+	}
+
+	async removeAvatar(id: number) {
+		const user = await this.usersRepository.findOne({
+			where: { id },
+			include: {
+				model: SettingsModel
+			}
+		});
+
+		this.filesService.removeFile(user.avatar);
+
+		await user.update({
+			avatar: ''
 		});
 
 		return ResponseUserDto.createResponseUser(user);

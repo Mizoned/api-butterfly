@@ -14,6 +14,9 @@ import { ApiValidationPipe } from '@common/pipes/api-validation.pipe';
 import { AllExceptionsFilter } from '@common/filters/api-exception.filter';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import mainConfig from '@common/config/main.config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { FilesModule } from '@modules/files/files.module';
+import * as path from "path";
 
 @Module({
 	imports: [
@@ -21,6 +24,9 @@ import mainConfig from '@common/config/main.config';
 			load: [mainConfig],
 			envFilePath: ['.env'],
 			isGlobal: true
+		}),
+		ServeStaticModule.forRoot({
+			rootPath: path.resolve(__dirname, 'static'),
 		}),
 		SequelizeModule.forRootAsync({
 			useFactory: (configService: ConfigService) => ({
@@ -42,7 +48,8 @@ import mainConfig from '@common/config/main.config';
 		TokensModule,
 		SchedulesModule,
 		ExpensesModule,
-		SettingsModule
+		SettingsModule,
+		FilesModule
 	],
 	controllers: [],
 	providers: [

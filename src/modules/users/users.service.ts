@@ -44,7 +44,14 @@ export class UsersService {
 					{ transaction }
 				);
 
-				user.settings = await this.settingsService.firstCreate(user.id, transaction);
+				await this.settingsService.firstCreate(user.id, transaction);
+
+				await user.reload({
+					include: {
+						model: SettingsModel
+					},
+					transaction
+				});
 			})
 			.catch(() => {
 				throw new ApiException(

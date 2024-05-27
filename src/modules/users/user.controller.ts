@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Put } from '@nestjs/common';
+import {
+	Body,
+	Controller, Delete,
+	FileTypeValidator,
+	Get, MaxFileSizeValidator,
+	ParseFilePipe,
+	Post,
+	Put,
+	UploadedFile,
+	UseInterceptors, UsePipes
+} from '@nestjs/common';
 import { UserService } from '@modules/users/user.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
@@ -6,6 +16,9 @@ import { IJwtPayload } from '@modules/tokens/interfaces/jwt-payload.interface';
 import { UpdateUserDto } from '@modules/users/dto/update-user.dto';
 import { UpdatePasswordDto } from '@modules/users/dto/update-password.dto';
 import { UpdateWorkspaceDto } from '@modules/users/dto/update-workspace.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileSizeValidationPipe } from '@common/pipes/file-size-validation.pipe';
+import { FileTypeValidationPipe } from '@common/pipes/file-type-validation.pipe';
 
 @ApiTags('Пользователь')
 @Controller('user')
@@ -37,5 +50,32 @@ export class UserController {
 		@Body() workspaceDto: UpdateWorkspaceDto
 	) {
 		return await this.userService.updateWorkspace(user.id, workspaceDto);
+	}
+
+	@ApiOperation({ summary: 'Обновление аватара пользователя' })
+	@Post('/profile/avatar')
+	@UseInterceptors(FileInterceptor('avatar'))
+	async updateAvatar(
+		@CurrentUser() user: IJwtPayload,
+		@UploadedFile(
+			new FileTypeValidationPipe(
+				'avatar',
+				'Неподдерживаемый формат файла. Пожалуйста, загрузите изображение в одном из следующих форматов: JPEG, PNG',
+				['image/png', 'image/jpeg']
+			),
+			new FileSizeValidationPipe(
+				'avatar',
+				'Размер файла превышает допустимый лимит (2 МБ). Пожалуйста, загрузите изображение меньшего размера.',
+				2000000
+			)
+		) avatar: Express.Multer.File
+	) {
+		return await this.userService.updateAvatar(user.id, avatar);
+	}
+
+	@ApiOperation({ summary: 'Удаление аватара пользователя' })
+	@Delete('/profile/avatar')
+	async removeAvatar(@CurrentUser() user: IJwtPayload) {
+		return await this.userService.removeAvatar(user.id);
 	}
 }
