@@ -25,8 +25,11 @@ import * as path from "path";
 			envFilePath: ['.env'],
 			isGlobal: true
 		}),
-		ServeStaticModule.forRoot({
-			rootPath: path.resolve(__dirname, 'static'),
+		ServeStaticModule.forRootAsync({
+			useFactory: (configService: ConfigService) => [{
+				rootPath: path.resolve(__dirname, '..', configService.get('UPLOADS_DEST') ?? 'uploads'),
+			}],
+			inject: [ConfigService]
 		}),
 		SequelizeModule.forRootAsync({
 			useFactory: (configService: ConfigService) => ({

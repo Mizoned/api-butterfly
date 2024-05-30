@@ -87,40 +87,48 @@ export class UserService {
 	}
 
 	async updateAvatar(id: number, file: Express.Multer.File) {
-		const user = await this.usersRepository.findOne({
-			where: { id },
-			include: {
-				model: SettingsModel
+		try {
+			const user = await this.usersRepository.findOne({
+				where: { id },
+				include: {
+					model: SettingsModel
+				}
+			});
+
+			if (user.avatar) {
+				await this.filesService.removeFile(user.avatar);
 			}
-		});
 
-		if (user.avatar) {
-			this.filesService.removeFile(user.avatar);
+			const fileName = await this.filesService.createFile(FileType.AVATAR, file)
+
+			await user.update({
+				avatar: fileName
+			});
+
+			return ResponseUserDto.createResponseUser(user);
+		} catch (error) {
+			throw new ApiException('Не удалось обновить изображение профиля', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-		const fileName = this.filesService.createFile(FileType.AVATAR, file)
-
-		await user.update({
-			avatar: fileName
-		});
-
-		return ResponseUserDto.createResponseUser(user);
 	}
 
 	async removeAvatar(id: number) {
-		const user = await this.usersRepository.findOne({
-			where: { id },
-			include: {
-				model: SettingsModel
-			}
-		});
+		try {
+			const user = await this.usersRepository.findOne({
+				where: { id },
+				include: {
+					model: SettingsModel
+				}
+			});
 
-		this.filesService.removeFile(user.avatar);
+			await this.filesService.removeFile(user.avatar);
 
-		await user.update({
-			avatar: ''
-		});
+			await user.update({
+				avatar: ''
+			});
 
-		return ResponseUserDto.createResponseUser(user);
+			return ResponseUserDto.createResponseUser(user);
+		} catch (error) {
+			throw new ApiException('Не удалось удалить изображение профиля', HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

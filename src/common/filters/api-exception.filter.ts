@@ -3,11 +3,21 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { ApiError, ApiException } from '@common/exceptions/api.exception';
 
 interface ApiErrorResponse {
-	message: string;
+	message?: string;
 	errors?: ApiError[];
 	statusCode: number;
 	timestamp?: string;
 	path?: any;
+}
+
+interface ServeStaticError {
+	errno: number,
+	code: string,
+	syscall: string,
+	path: string,
+	expose: boolean,
+	statusCode: number,
+	status: number
 }
 
 @Catch()
@@ -23,25 +33,35 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
 		if (exception instanceof ApiException) {
 			httpStatus = exception.getStatus();
-
 			responseBody = {
 				message: exception.message,
 				errors: exception.errors,
 				statusCode: httpStatus
-			};
+			}
+		} else if (exception instanceof HttpException) {
+			httpStatus = exception.getStatus();
+			responseBody = {
+				message: exception.message,
+				statusCode: httpStatus,
+			}
+		} else if (typeof exception === 'object' && 'statusCode' in (exception as ServeStaticError)) {
+			const staticException = exception as ServeStaticError;
+			httpStatus = staticException.statusCode;
+			responseBody = {
+				message: 'Ошибка обращения к статическим файлам',
+				statusCode: httpStatus,
+			}
 		} else {
-			httpStatus =
-				exception instanceof HttpException
-					? exception.getStatus()
-					: HttpStatus.INTERNAL_SERVER_ERROR;
-
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 			responseBody = {
 				message: 'Произошла непредвиденная ошибка',
 				statusCode: httpStatus,
-				timestamp: new Date().toISOString(),
-				path: httpAdapter.getRequestUrl(ctx.getRequest())
 			};
 		}
+
+		responseBody.timestamp = new Date().toISOString();
+		responseBody.path = httpAdapter.getRequestUrl(ctx.getRequest());
+
 		console.log('Exception filter', exception);
 
 		httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
