@@ -26,10 +26,6 @@ export class CustomersService {
 			throw new ApiException('Клиент не найден', HttpStatus.NOT_FOUND);
 		}
 
-		if (customer.userId !== userId) {
-			throw new ApiException('У вас нет прав на просмотр клиента', HttpStatus.FORBIDDEN);
-		}
-
 		return customer;
 	}
 
@@ -42,7 +38,7 @@ export class CustomersService {
 			throw new ApiException('Ошибка валидации', HttpStatus.BAD_REQUEST, [
 				{
 					property: 'mobilePhone',
-					message: 'Номер телефона принаджелит другому клиенту'
+					message: 'Номер телефона принадлежит другому клиенту'
 				}
 			]);
 		}
@@ -59,15 +55,7 @@ export class CustomersService {
 		userId: number,
 		customerDto: UpdateCustomerDto
 	): Promise<CustomerModel> {
-		const customer = await this.customersRepository.findByPk(id);
-
-		if (!customer) {
-			throw new ApiException('Клиент не найден', HttpStatus.NOT_FOUND);
-		}
-
-		if (customer.userId !== userId) {
-			throw new ApiException('У вас нет прав на обновление клиента', HttpStatus.FORBIDDEN);
-		}
+		const customer = await this.findOne(id, userId);
 
 		try {
 			await customer.update(customerDto);
@@ -81,22 +69,13 @@ export class CustomersService {
 	}
 
 	async delete(id: number, userId: number): Promise<{ deletedCount: number }> {
-		const customer = await this.customersRepository.findByPk(id);
+		const customer = await this.findOne(id, userId);
 
-		if (!customer) {
-			throw new ApiException('Клиент не найден', HttpStatus.NOT_FOUND);
-		}
-
-		if (customer.userId !== userId) {
-			throw new ApiException('У вас нет прав на удаление клиента', HttpStatus.FORBIDDEN);
-		}
-
-		const deletedCount = await this.customersRepository.destroy({ where: { id } });
-
-		if (deletedCount === 0) {
+		try {
+			await customer.destroy();
+			return { deletedCount: 1 };
+		} catch (e) {
 			throw new ApiException('Не удалось удалить клиента', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-		return { deletedCount };
 	}
 }

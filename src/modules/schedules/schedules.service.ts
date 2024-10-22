@@ -73,11 +73,8 @@ export class SchedulesService {
 	}
 
 	async findOne(id: number, userId: number): Promise<ScheduleModel> {
-		return await this.validateScheduleAccess(id, userId);
-	}
-
-	private async validateScheduleAccess(id: number, userId: number): Promise<ScheduleModel> {
-		let schedule = await this.scheduleRepository.findByPk(id, {
+		const schedule = await this.scheduleRepository.findOne({
+			where: { id, userId },
 			include: [
 				{
 					model: CustomerModel
@@ -94,10 +91,6 @@ export class SchedulesService {
 
 		if (!schedule) {
 			throw new ApiException('Расписание не найдено', HttpStatus.NOT_FOUND);
-		}
-
-		if (schedule.userId !== userId) {
-			throw new ApiException('У вас недостаочно прав', HttpStatus.FORBIDDEN);
 		}
 
 		return schedule;
@@ -160,34 +153,32 @@ export class SchedulesService {
 	}
 
 	async create(userId: number, scheduleDto: CreateScheduleDto): Promise<any> {
-		const customer = await this.validateCustomer(scheduleDto.customerId, userId);
+		await this.validateCustomer(scheduleDto.customerId, userId);
 
-		const isOccupied = await this.validateTimeSlot(userId, scheduleDto);
+		await this.validateTimeSlot(userId, scheduleDto);
 
 		const products = await this.validateProducts(scheduleDto, userId);
 
 		const { id: scheduleId } = await this.createTransaction(userId, scheduleDto, products);
 
-		return this.findOne(scheduleId, userId);
+		return await this.findOne(scheduleId, userId);
 	}
 
 	private async validateCustomer(customerId: number, userId: number) {
-		const customer = await this.customersService.findOne(customerId, userId);
-
-		if (!customer) {
+		try {
+			return await this.customersService.findOne(customerId, userId);
+		} catch (e) {
 			throw new ApiException('Ошибка валидации', HttpStatus.BAD_REQUEST, [
 				{ property: 'customerId', message: 'Клиент не найден' }
 			]);
 		}
-
-		return customer;
 	}
 
 	private async validateTimeSlot(
 		userId: number,
 		scheduleDto: CreateScheduleDto,
 		excludeScheduleId?: number
-	): Promise<boolean> {
+	): Promise<void> {
 		const { startOfDay, endOfDay } = await this.getUserWorkdaySettings(
 			userId,
 			scheduleDto.date
@@ -239,8 +230,6 @@ export class SchedulesService {
 				}
 			]);
 		}
-
-		return isOccupied;
 	}
 
 	private async getUserWorkdaySettings(userId: number, date: string) {
@@ -338,11 +327,11 @@ export class SchedulesService {
 	}
 
 	async update(id: number, userId: number, scheduleDto: CreateScheduleDto): Promise<any> {
-		const schedule = await this.validateScheduleAccess(id, userId);
+		const schedule = await this.findOne(id, userId);
 
-		const customer = await this.validateCustomer(scheduleDto.customerId, userId);
+		await this.validateCustomer(scheduleDto.customerId, userId);
 
-		const isOccupied = await this.validateTimeSlot(userId, scheduleDto, id);
+		await this.validateTimeSlot(userId, scheduleDto, id);
 
 		const products = await this.validateProducts(scheduleDto, userId);
 
@@ -406,8 +395,7 @@ export class SchedulesService {
 	}
 
 	async cancel(id: number, userId: number) {
-		const schedule = await this.validateScheduleAccess(id, userId);
-		const customer = await this.validateCustomer(schedule.customerId, userId);
+		const schedule = await this.findOne(id, userId);
 
 		await schedule.update({ status: StatusSchedule.CANCELED });
 
@@ -415,8 +403,7 @@ export class SchedulesService {
 	}
 
 	async compete(id: number, userId: number) {
-		const schedule = await this.validateScheduleAccess(id, userId);
-		const customer = await this.validateCustomer(schedule.customerId, userId);
+		const schedule = await this.findOne(id, userId);
 
 		await schedule.update({ status: StatusSchedule.SUCCESS });
 

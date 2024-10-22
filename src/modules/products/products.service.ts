@@ -26,10 +26,6 @@ export class ProductsService {
 			throw new ApiException('Услуга не найдена', HttpStatus.NOT_FOUND);
 		}
 
-		if (product.userId !== userId) {
-			throw new ApiException('У вас нет прав на просмотр услуги', HttpStatus.FORBIDDEN);
-		}
-
 		return product;
 	}
 
@@ -46,15 +42,7 @@ export class ProductsService {
 	}
 
 	async update(id: number, userId: number, productDto: UpdateProductDto): Promise<ProductModel> {
-		const product = await this.productsRepository.findByPk(id);
-
-		if (!product) {
-			throw new ApiException('Услуга не найдена', HttpStatus.NOT_FOUND);
-		}
-
-		if (product.userId !== userId) {
-			throw new ApiException('У вас нет прав на обновление услуги', HttpStatus.FORBIDDEN);
-		}
+		const product = await this.findOne(id, userId);
 
 		try {
 			await product.update(productDto);
@@ -68,22 +56,13 @@ export class ProductsService {
 	}
 
 	async delete(id: number, userId: number): Promise<{ deletedCount: number }> {
-		const product = await this.productsRepository.findByPk(id);
+		const product = await this.findOne(id, userId);
 
-		if (!product) {
-			throw new ApiException('Услуга не найден', HttpStatus.NOT_FOUND);
-		}
-
-		if (product.userId !== userId) {
-			throw new ApiException('У вас нет прав на удаление услуги', HttpStatus.FORBIDDEN);
-		}
-
-		const deletedCount = await this.productsRepository.destroy({ where: { id } });
-
-		if (deletedCount === 0) {
+		try {
+			await product.destroy();
+			return { deletedCount: 1 };
+		} catch (e) {
 			throw new ApiException('Не удалось удалить продукт', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-		return { deletedCount };
 	}
 }
