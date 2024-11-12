@@ -1,22 +1,15 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, BelongsToMany } from 'sequelize-typescript';
-import { DataTypes } from 'sequelize';
+import { DataTypes, CreationOptional } from 'sequelize';
 import { UserModel } from '@modules/users/models/user.model';
 import { ScheduleProductsModel } from '@modules/schedules/models/schedule-products.model';
 import { ScheduleModel } from '@modules/schedules/models/schedule.model';
+import { ProductStatus, ProductCreationAttrs } from '@modules/products/interfaces';
 
-interface ProductCreationAttrs {
-	name: string;
-	price: number;
-	userId: number;
-}
-
-export enum StatusProduct {
-	DELETED = 'DELETED',
-	ACTIVE = 'ACTIVE'
-}
-
-@Table({ tableName: 'products' })
+@Table({ tableName: 'products', timestamps: true })
 export class ProductModel extends Model<ProductModel, ProductCreationAttrs> {
+	declare createdAt: CreationOptional<Date>;
+	declare updatedAt: CreationOptional<Date>;
+
 	@Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
 	id: number;
 
@@ -27,8 +20,8 @@ export class ProductModel extends Model<ProductModel, ProductCreationAttrs> {
 	price: number;
 
 	@Column({
-		type: DataTypes.ENUM(...Object.values(StatusProduct)),
-		defaultValue: StatusProduct.ACTIVE
+		type: DataTypes.ENUM(...Object.values(ProductStatus)),
+		defaultValue: ProductStatus.ACTIVE
 	})
 	status: string;
 
