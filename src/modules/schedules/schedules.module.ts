@@ -18,6 +18,7 @@ import { CustomersModule } from '@modules/customers/customers.module';
 		CustomersModule
 	],
 	providers: [SchedulesService],
-	controllers: [SchedulesController]
+	controllers: [SchedulesController],
+	exports: [SchedulesService]
 })
 export class SchedulesModule {}

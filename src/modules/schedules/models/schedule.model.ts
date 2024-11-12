@@ -1,26 +1,16 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, BelongsToMany } from 'sequelize-typescript';
-import { DataTypes } from 'sequelize';
+import {CreationOptional, DataTypes } from 'sequelize';
 import { UserModel } from '@modules/users/models/user.model';
 import { CustomerModel } from '@modules/customers/models/customer.model';
 import { ProductModel } from '@modules/products/models/product.model';
 import { ScheduleProductsModel } from '@modules/schedules/models/schedule-products.model';
-
-interface ScheduleCreationAttrs {
-	userId: number;
-	customerId: number;
-	date: string;
-	timeStart: string;
-	timeEnd: string;
-}
-
-export enum StatusSchedule {
-	SUCCESS = 'SUCCESS',
-	CANCELED = 'CANCELED',
-	PROCESS = 'PROCESS'
-}
+import { ScheduleCreationAttrs, ScheduleStatus } from '../interfaces';
 
 @Table({ tableName: 'schedules' })
 export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
+	declare createdAt: CreationOptional<Date>;
+	declare updatedAt: CreationOptional<Date>;
+
 	@Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
 	id: number;
 
@@ -34,8 +24,8 @@ export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
 	timeEnd: string;
 
 	@Column({
-		type: DataTypes.ENUM(...Object.values(StatusSchedule)),
-		defaultValue: StatusSchedule.PROCESS
+		type: DataTypes.ENUM(...Object.values(ScheduleStatus)),
+		defaultValue: ScheduleStatus.PROCESS
 	})
 	status: string;
 
@@ -54,8 +44,5 @@ export class ScheduleModel extends Model<ScheduleModel, ScheduleCreationAttrs> {
 	customer: CustomerModel;
 
 	@BelongsToMany(() => ProductModel, () => ScheduleProductsModel)
-	products: Array<
-		| (ProductModel & { additional: ScheduleProductsModel })
-		| (ProductModel & { ScheduleProductsModel: ScheduleProductsModel })
-	>;
+	products: Array<ProductModel & { details: ScheduleProductsModel }>;
 }

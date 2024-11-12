@@ -11,10 +11,7 @@ interface ScheduleProductsCreationAttrs {
 }
 
 @Table({ tableName: 'scheduleProducts' })
-export class ScheduleProductsModel extends Model<
-	ScheduleProductsModel,
-	ScheduleProductsCreationAttrs
-> {
+export class ScheduleProductsModel extends Model<ScheduleProductsModel, ScheduleProductsCreationAttrs> {
 	@Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
 	id: number;
 

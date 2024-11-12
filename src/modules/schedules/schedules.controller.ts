@@ -4,6 +4,7 @@ import { SchedulesService } from '@modules/schedules/schedules.service';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { IJwtPayload } from '@modules/tokens/interfaces/jwt-payload.interface';
 import { CreateScheduleDto } from '@modules/schedules/dto/create-schedule.dto';
+import { ScheduleStatus } from './interfaces';
 
 @ApiTags('Расписание пользователя')
 @Controller('schedules')
@@ -16,14 +17,24 @@ export class SchedulesController {
 		return await this.scheduleService.findAll(user.id);
 	}
 
+	@Get('/processed')
+	async findAllProcessed(@CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.findAllByStatus(user.id, ScheduleStatus.PROCESS);
+	}
+
 	@Get('/completed')
 	async findAllCompleted(@CurrentUser() user: IJwtPayload) {
-		return await this.scheduleService.findAllCompleted(user.id);
+		return await this.scheduleService.findAllByStatus(user.id, ScheduleStatus.SUCCESS);
 	}
 
 	@Get('/canceled')
 	async findAllCanceled(@CurrentUser() user: IJwtPayload) {
-		return await this.scheduleService.findAllCanceled(user.id);
+		return await this.scheduleService.findAllByStatus(user.id, ScheduleStatus.CANCELED);
+	}
+
+	@Get('/today')
+	async getTodaySchedules(@CurrentUser() user: IJwtPayload) {
+		return await this.scheduleService.getTodaySchedules(user.id);
 	}
 
 	@ApiOperation({ summary: 'Получение расписания по id' })
