@@ -1,5 +1,5 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
-import { DataTypes } from 'sequelize';
+import { DataTypes, CreationOptional } from 'sequelize';
 import { UserModel } from '@modules/users/models/user.model';
 import { ScheduleModel } from '@modules/schedules/models/schedule.model';
 
@@ -14,6 +14,9 @@ interface CustomerCreationAttrs {
 
 @Table({ tableName: 'customers' })
 export class CustomerModel extends Model<CustomerModel, CustomerCreationAttrs> {
+	declare createdAt: CreationOptional<Date>;
+	declare updatedAt: CreationOptional<Date>;
+
 	@Column({ type: DataTypes.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
 	id: number;
 

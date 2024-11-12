@@ -4,7 +4,9 @@ import { CustomerModel } from './models/customer.model';
 import { CreateCustomerDto } from '@modules/customers/dto/create-customer.dto';
 import { UpdateCustomerDto } from '@modules/customers/dto/update-customer.dto';
 import { ApiException } from '@common/exceptions/api.exception';
+import {isCurrentMonth} from "@common/utils";
 
+//TODO в будущем добавить активацию ACTIVE DELETED
 @Injectable()
 export class CustomersService {
 	constructor(
@@ -14,6 +16,13 @@ export class CustomersService {
 	async findAll(userId: number): Promise<CustomerModel[]> {
 		return this.customersRepository.findAll({
 			where: { userId }
+		});
+	}
+
+	async findAndCountAll(userId: number): Promise<{ rows: CustomerModel[], count: number }> {
+		return this.customersRepository.findAndCountAll({
+			where: { userId },
+			distinct: true,
 		});
 	}
 
@@ -76,6 +85,15 @@ export class CustomersService {
 			return { deletedCount: 1 };
 		} catch (e) {
 			throw new ApiException('Не удалось удалить клиента', HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	async getTotalCountCustomers(userId: number, date: Date) {
+		const { rows, count } = await this.findAndCountAll(userId);
+
+		return {
+			newTotalCount: rows.reduce((acc, customer) => isCurrentMonth(customer.createdAt) ? acc + 1 : acc, 0),
+			totalCount: count
 		}
 	}
 }
