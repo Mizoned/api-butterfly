@@ -17,6 +17,7 @@ import mainConfig from '@common/config/main.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { FilesModule } from '@modules/files/files.module';
 import * as path from "path";
+import {StatisticsModule} from "@modules/statistics/statistics.module";
 
 @Module({
 	imports: [
@@ -52,7 +53,8 @@ import * as path from "path";
 		SchedulesModule,
 		ExpensesModule,
 		SettingsModule,
-		FilesModule
+		FilesModule,
+		StatisticsModule
 	],
 	controllers: [],
 	providers: [
